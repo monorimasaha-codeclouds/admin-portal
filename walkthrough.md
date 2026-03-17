@@ -10,9 +10,10 @@ A full-stack admin portal with **Next.js + Tailwind CSS** frontend, **Node.js/Ex
 - ✅ Client-side validation (URL, email, phone, card number, CVV)
 - ✅ Projects listing page with search/filter
 - ✅ Project detail page with masked card info
-- ✅ AuthGuard (auto-redirect to login for protected routes)
-- ✅ Default user: `monorima.saha@codeclouds.co.in` / `123456`
-- ✅ Test reports placeholder (for future PDF generation)
+- ✅ User Management Module (Admin-only restricted section)
+- ✅ Role-Based Access Control (`role`: admin/user, `status`: active/inactive)
+- ✅ **Phase 10: Multi-Device PDF Generation**: Captures Desktop, iPad, iPhone, and Android viewports.
+- ✅ **"Download PDF" Action Button**: Integrated direct PDF generation from the project listing page.
 
 ---
 
@@ -84,6 +85,7 @@ cd backend && node scripts/init-db-with-user.js
 # Option B: Manual import
 mysql -u root -p < database/schema.sql
 ```
+- **Usage**: Use `node scripts/generate_report.js` from the `/backend` directory to run the automation pipeline and produce the PDF file locally.
 
 ### 2. Configure backend
 Edit [backend/.env](file:///home/codeclous-monorimas/Documents/admin-portal/backend/.env) with your MySQL credentials:
