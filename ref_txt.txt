@@ -1,0 +1,442 @@
+    Note: According to the discussion with the developer, only robots.txt and HTTPS is
+                     checked for security testing in this test report.
+
+
+[A] Offer Funnel: ( https://dealsandmoreonline.com/stihl_magnum_881_chainsaw/?affId=1   )
+    1. For VISA card entry A MASTERCARD popup will be displayed, which can be cancelled.​
+
+
+
+
+    2. For non-affiliate url a pop-up will be shown that orders can't proceed.​
+​       [Blank page should not be shown while the user not pass affid]​
+
+
+
+
+​
+
+
+
+                                                                                            1
+Usability (Desktop and Mobile)
+Devices and Browsers
+  1.​ Windows - Chrome, Firefox, Microsoft Edge Chromium FAIL
+  1.​ The images are pixelated
+
+
+
+
+  2.​ The images should be middle aligned
+
+
+
+
+                                                                2
+Firefox:
+   1.​ The fonts of the placeholders in a single form should be same
+
+
+
+
+   2.​ Mac - Chrome, Firefox, Safari, Microsoft Edge Chromium FAIL
+   3.​ iOS -
+
+
+                                                                       3
+           A)​ iPad 6th Gen or iPad Mini4, iPad Pro, iPad Air FAIL
+Ipad Air
+  1.​ Blank space showing below footer
+
+
+
+
+Ipad 6:
+  1.​ Blank space showing below footer
+
+
+
+
+                                                                     4
+5
+2.​ The placeholder is showing cropped
+
+
+
+
+                                         6
+3.​ The cross icon needs to be middle aligned
+
+
+
+
+                                                7
+      B)​ iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15
+          Plus FAIL
+      C)​ iOS -
+
+
+4.​ iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15 Plus
+   FAIL
+
+
+
+
+                                                                                           8
+  5.​ Android
+        A)​ Samsung Galaxy s9 TAB
+        B)​ Pixel 9, Galaxy S21 FE, Galaxy A13 FAIL
+Samsung Galaxy S26 Ultra v16
+  1.​ The pop up should fit inside a single window
+
+
+
+
+                                                      9
+5. In-app browser testing for Android and IOS devices both PASS
+A.​ Facebook. (Test The offer Site by appending the Affiliate ID in the offer link)
+
+
+
+
+   order_id=5768700
+
+
+
+
+      B.​ Skype (Check the Thumbnail in the chat window)
+
+
+
+
+                                                                                      10
+6. Dark Mode
+     A.​ Android (Both in A13 and S21 FE)
+     B.​ Ios (Any of the iPhone 12/13/14 Promax)
+     ** Android In APP can be checked in Dark Mode
+
+
+
+7. IOS/Android zoom issue FAIL
+  Steps for IOS devices
+         a) open the website in Chrome/Firefox browser<click anywhere or in prospect
+         form<rotate into landscape mode with opened keypad<Again rotate into portrait
+         mode.
+         b) The same needs to be checked for all the pop-ups (Error, what’s this, Privacy
+         Policy, Contact and Terms, etc.)
+
+
+
+
+                                                                                            11
+          Steps for Android devices
+                 a) Open the website in Firefox browsers
+                 b) Open the website in Chrome and try to zoom via tapping the
+                     screen, the website should not take a zoom effect
+
+
+8. Open Graph Information for Multiple Social Media Platforms: PASS
+
+ ​      https://www.opengraph.xyz/
+
+Report Link:
+https://www.opengraph.xyz/url/https%3A%2F%2Fbestshoptogo.com%2Ftenpoint_siege_rs410
+%2F%3FaffId%3D1
+
+
+
+
+UI/UX Friendliness and Responsiveness (Desktop and Mobile)
+     1.​ Different form elements, placeholders, and labels (wherever applicable) should be
+        prominent and properly visible on different devices. PASS
+     2.​ Action buttons should be properly accessible based on the viewport PASS
+     3.​ Quickly visible spelling & grammar PASS
+     4.​ Tab indexing PASS
+
+
+
+                                                                                             12
+  5.​ Privacy/terms/contact/Error popup(for both prospect & billing form) content & it’s popup
+     quality check in both portrait & Landscape mode.(Check this for Mobile and desktop both.)
+     PASS
+  6.​ Favicon check: PASS
+  7.​ Responsiveness Check with the help of browser emulation PASS
+  8.​ In the Footer Section Copyright Should be mentioned properly on every page in Desktop
+     and Mobile. FAIL
+
+
+
+
+Functional (Desktop and Mobile)
+  1.​ Mandatory and optional field validation PASS
+  2.​ Field allowed character length validation PASS
+  3.​ Field type-wise value validation (e.g. email, phone, etc.) PASS
+  4.​ Proper error messages should be showing FAIL ​
+
+
+
+
+  5.​ Proper Error message should appear after processing order with Decline card FAIL ​
+     [Ref - Decline card in CRM section]​
+
+
+  6.​ Country-wise proper state population FAIL ​
+
+
+
+
+  7.​ Country-wise zip code validation PASS
+  8.​ City and state auto-population according to zip code. - NA
+
+
+                                                                                                 13
+9.​ Check whether the order is processed or not for the stateless country if the user keeps the
+   state field blank (Requirement specific) - NA
+10.​Input masking for phone no. - NA
+      A.​ If Input masking is present check phone no. validation that it is accepting less than
+         10 digits
+      B.​ Check whether Phone no. masking disappears or not
+             ●​ Step 1: Enter Phone no. in phone no. field
+             ●​ Step 2: Click on any field placed before phone no.
+             ●​ Step 3: Try to go to the phone no—field by Pressing the TAB button.
+11. Input masking for Canada zip code (if the offer is for Canada) - NA
+12. Xverify functionality test based on email, address, and phone no. etc. -
+    Requirement-specific - NA
+
+13. Session Testing PASS ​
+
+
+
+
+15. If the offer site has a prospect form after the product selection page or within the same
+     page it should only process with product selection or directly from the checkout page.
+     PASS
+
+
+
+
+                                                                                                14
+​
+
+
+
+
+    16. Check the card expiry date for a one-time product, the order should be processed if
+        the user chooses the card expiry date one month ahead of the current date. PASS ​
+
+
+
+
+​
+    17. Credit card validation and placeholder (if any) working properly in different
+        browsers/devices PASS
+​
+
+
+
+
+                                                                                              15
+    19. If the PayPal payment option is present on a single checkout page (ie. Billing
+           shipping form on the same page) - NA
+             ●​ Check whether Error Popups are showing or not if the User clicks on the Paypal
+                button by keeping Shipping and billing forms blank
+    20. Check the payment process flow redirection for Apple Pay, Google Pay and
+           Paypal. - NA
+    21. Check that the user is not able to back via the Browser back button - FAIL
+           Check from checkout, upsell pages, and Thank you page. (From all the browsers)​
+​      [User should not be back from the checkout and thank you page ]
+
+
+
+
+CRM End check (Desktop and Mobile)
+
+
+    2.​ Check the flows working properly with their campaign ID (Desktop and Mobile)
+
+
+                1444444444444441 => Decline | VISA​
+       ​        pritam.bhar+002000@codeclouds.com
+
+
+
+
+                                                                                                 16
+Note: Products are being placed under the Main Campaign in CRM instead of the
+Decline Campaign as mentioned in the email.​
+
+
+
+
+                                                             ​
+
+
+
+
+     1444444444444445 => Decline | Master​
+​    pritam.bhar+002001@codeclouds.com ​
+Note: Products are being placed under the Main Campaign in CRM instead of the
+Decline Campaign as mentioned in the email.​
+
+
+
+
+                                                                 ​
+​
+​
+
+
+
+
+                                                                            17
+    1444444444444442 => Prepaid | VISA​
+​   pritam.bhar+002002@codeclouds.com ​
+​   812829839,812829840​
+
+
+
+
+​                                           ​
+​   ​
+
+
+    1444444444444446 => Prepaid | Master​
+​   pritam.bhar+002003@codeclouds.com ​
+​   812829842,812829843​   ​
+
+
+
+
+​                                               ​
+​   ​
+​
+
+
+
+
+                                                    18
+    1444444444444440 => Regular | VISA​
+​   pritam.bhar+002004@codeclouds.com ​
+​   812829844,812829845​   ​
+
+
+
+
+​                                           ​
+​   ​
+
+
+    1444444444444443 => Regular | Master​
+​   pritam.bhar+002005@codeclouds.com ​
+​   812829846,812829847​
+    ​
+
+
+
+
+​
+
+
+
+
+                                                19
+    ​
+​
+    4147090000000001 => Regular | VISA BSB​
+​   pritam.bhar+002006@codeclouds.com ​
+​   812829848,812829849​
+
+
+
+
+​                                                   ​
+​   ​
+​
+    5156760000000001 => Regular | Master BSB​
+​   pritam.bhar+002007@codeclouds.com ​
+​   812829850,812829851​   ​
+
+
+
+
+​                                               ​
+
+
+
+
+                                                        20
+     ​     ​
+     ​
+           ​
+
+
+
+
+Console Issues (Desktop and Mobile)
+
+  A.​ 404 Issues in JS Console [Ref - Point B]
+  B.​ Javascript Uncaught Exceptions​
+     Desktop - ​
+
+
+
+
+                                                 ​
+     Mobile - // No issue found​
+
+
+
+
+                                                     21
+                                                                                 ​
+   ​
+
+C.​ Verify that Ajax Should not trigger Multiple Times
+       ●​ Upon button click, multiple requests should not be triggered.
+       ●​ Multiple requests should not trigger by hitting the enter button forcefully multiple
+          times after the loader moves for the 1st time. (check this for all the buttons/banner
+          clicks)
+       ●​ Multiple requests should not trigger by hitting the space button forcefully multiple
+          times.
+       ●​ Multiple requests should not trigger upon an upsell button/banner click.
+
+
+
+
+                                                                                                 22
+     Desktop - ​
+
+
+
+
+                                                                                 ​
+     ​
+     Mobile - ​
+
+
+
+
+Security and Performance
+
+  1.​ On page load, the URL should force to HTTPS if opened with HTTP URL PASS
+
+
+
+
+                                                                                     23
+2.​ Robots.txt check: PASS
+
+
+
+
+3.​ SSl checking: PASS / FAIL
+
+
+                                24
+4.​ SEO checking: PASS / FAIL
+
+
+
+
+                                25
+

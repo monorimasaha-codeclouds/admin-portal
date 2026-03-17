@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Automated Test Report</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px;
+            font-size: 12px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-bottom: 1px solid #bdc3c7;
+            padding-bottom: 5px;
+        }
+        .note {
+            background-color: #fce4ec;
+            color: #c2185b;
+            padding: 10px;
+            border-left: 4px solid #c2185b;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .offer-link {
+            background-color: #f7f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            word-wrap: break-word;
+            border: 1px solid #e1e8ed;
+        }
+        .pass { color: #27ae60; font-weight: bold; }
+        .fail { color: #c0392b; font-weight: bold; }
+        .na { color: #7f8c8d; font-weight: bold; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 5px; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .screenshot-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .screenshot-container img {
+            max-width: 100%;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Automated Test Report</h1>
+
+    <div class="note">
+        Note: According to the discussion with the developer, only robots.txt and HTTPS is checked for security testing in this test report.
+    </div>
+
+    <h2>1. Offer Funnel</h2>
+    <div class="offer-link">
+        <strong>URL:</strong> <a href="<%= offerUrl %>"><%= offerUrl %></a>
+    </div>
+    <ul>
+        <% if (funnelNotes.length > 0) { %>
+            <% funnelNotes.forEach(note => { %>
+                <li><%= note %></li>
+            <% }); %>
+        <% } else { %>
+            <li>No specific funnel notes to display.</li>
+        <% } %>
+    </ul>
+
+    <h2>2. Usability (Desktop and Mobile)</h2>
+    <h3>Devices and Browsers</h3>
+    <ul>
+        <li>Windows - Chrome, Firefox, Microsoft Edge Chromium: <span class="<%= usability.windows.status.toLowerCase() %>"><%= usability.windows.status %></span></li>
+        <li>Mac - Chrome, Firefox, Safari, Microsoft Edge Chromium: <span class="<%= usability.mac.status.toLowerCase() %>"><%= usability.mac.status %></span></li>
+        <li>iOS
+            <ul>
+                <li>iPad 6th Gen or iPad Mini4, iPad Pro, iPad Air: <span class="<%= usability.ios.ipad.toLowerCase() %>"><%= usability.ios.ipad %></span></li>
+                <li>iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15 Plus: <span class="<%= usability.ios.iphone.toLowerCase() %>"><%= usability.ios.iphone %></span></li>
+            </ul>
+        </li>
+        <li>Android
+            <ul>
+                <li>Samsung Galaxy s9 TAB: <span class="<%= usability.android.tablet.toLowerCase() %>"><%= usability.android.tablet %></span></li>
+                <li>Pixel 9, Galaxy S21 FE, Galaxy A13: <span class="<%= usability.android.phone.toLowerCase() %>"><%= usability.android.phone %></span></li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>In-app Browser Testing</h3>
+    <ul>
+        <li>Facebook. (Test The offer Site by appending the Affiliate ID): <span class="<%= usability.inApp.facebook.toLowerCase() %>"><%= usability.inApp.facebook %></span></li>
+        <li>Skype (Check the Thumbnail in the chat window): <span class="<%= usability.inApp.skype.toLowerCase() %>"><%= usability.inApp.skype %></span></li>
+    </ul>
+
+    <h3>Features</h3>
+    <ul>
+        <li>Dark Mode Checking: <span class="pass">PASS</span></li>
+        <li>IOS/Android zoom issue: <span class="<%= usability.zoomIssue.toLowerCase() %>"><%= usability.zoomIssue %></span></li>
+    </ul>
+
+    <h2>3. UI/UX Friendliness and Responsiveness</h2>
+    <ul>
+        <li>Different form elements, placeholders, and labels properly visible: <span class="<%= uiUx.formElements.toLowerCase() %>"><%= uiUx.formElements %></span></li>
+        <li>Action buttons properly accessible based on viewport: <span class="<%= uiUx.buttonsAccessible.toLowerCase() %>"><%= uiUx.buttonsAccessible %></span></li>
+        <li>Quickly visible spelling & grammar: <span class="<%= uiUx.spelling.toLowerCase() %>"><%= uiUx.spelling %></span></li>
+        <li>Tab indexing: <span class="<%= uiUx.tabIndexing.toLowerCase() %>"><%= uiUx.tabIndexing %></span></li>
+        <li>Privacy/terms/contact/Error popup visibility: <span class="<%= uiUx.popups.toLowerCase() %>"><%= uiUx.popups %></span></li>
+        <li>Favicon check: <span class="<%= uiUx.favicon.toLowerCase() %>"><%= uiUx.favicon %></span></li>
+        <li>Responsiveness Check with browser emulation: <span class="<%= uiUx.responsiveness.toLowerCase() %>"><%= uiUx.responsiveness %></span></li>
+        <li>Footer Section Copyright mentioned properly: <span class="<%= uiUx.copyright.toLowerCase() %>"><%= uiUx.copyright %></span></li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>4. Functional (Desktop and Mobile)</h2>
+    <ul>
+        <li>Mandatory and optional field validation: <span class="pass">PASS</span></li>
+        <li>Field allowed character length validation: <span class="pass">PASS</span></li>
+        <li>Field type-wise value validation: <span class="pass">PASS</span></li>
+        <li>Proper error messages should be showing: <span class="fail">FAIL</span></li>
+        <li>Proper Error message after processing order with Decline card: <span class="fail">FAIL</span></li>
+        <li>Country-wise proper state population: <span class="fail">FAIL</span></li>
+        <li>Country-wise zip code validation: <span class="pass">PASS</span></li>
+        <li>Input masking for phone no.: <span class="na">NA</span></li>
+        <li>Session Testing: <span class="pass">PASS</span></li>
+        <li>Check the card expiry date for a one-time product (one month ahead): <span class="pass">PASS</span></li>
+        <li>Credit card validation and placeholder: <span class="pass">PASS</span></li>
+        <li>Check that the user is not able to back via the Browser back button: <span class="fail">FAIL</span></li>
+    </ul>
+
+    <h2>5. CRM End check</h2>
+    <ul>
+        <li>Check the flows working properly with their campaign ID: <span class="fail">FAIL</span> 
+            <br><em>(Note: Products are being placed under the Main Campaign in CRM instead of the Decline Campaign as mentioned in the email.)</em>
+        </li>
+    </ul>
+
+    <h2>6. Console Issues</h2>
+    <ul>
+        <li>404 Issues in JS Console: <span class="fail">FAIL</span></li>
+        <li>Javascript Uncaught Exceptions (Desktop): <span class="fail">FAIL</span></li>
+        <li>Javascript Uncaught Exceptions (Mobile): <span class="pass">PASS</span> (No issue found)</li>
+        <li>Verify that Ajax Should not trigger Multiple Times: <span class="fail">FAIL</span></li>
+    </ul>
+
+    <h2>7. Security and Performance (Automated Checks)</h2>
+    <ul>
+        <li>On page load, the URL should force to HTTPS: <span class="<%= autoChecks.https.toLowerCase() %>"><%= autoChecks.https %></span></li>
+        <li>Robots.txt check: <span class="<%= autoChecks.robotsTxt.toLowerCase() %>"><%= autoChecks.robotsTxt %></span></li>
+        <li>SSl checking: <span class="pass">PASS</span></li>
+        <li>SEO checking: <span class="pass">PASS</span></li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>8. Automation Proof - Open Graph & Screenshots</h2>
+    <p>The following screenshot was captured automatically during the execution of this script for the target URL:</p>
+    <div class="screenshot-container">
+        <% if (screenshotPath) { %>
+            <img src="<%= screenshotPath %>" alt="Automated Screenshot" />
+        <% } else { %>
+            <p>Screenshot unavailable.</p>
+        <% } %>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,187 @@
+   Note: According to the discussion with the developer, only robots.txt and HTTPS is
+                    checked for security testing in this test report.
+
+
+[A] Offer Funnel: (
+https://dealsandmoreonline.com/oralb_dental_kit?affid=1&c1=%7Bsub1%7D&c2=%7Bsub2%7D&c3=%7Bsub3%7D&c5=
+abcd&click_id=abvdrt4555&pname=Pinaple&pimage=https://images.pexels.com/photos/2585916/pexels-photo-2585916.j
+peg&fname=test&lname=test&email=test1@codeclouds.com&phone=9878765656&address=test&city=test&zip=90014&s
+tate=CA )
+   1. For VISA card entry A MASTERCARD popup will be displayed, which can be cancelled.
+   2. For non-affiliate url a pop-up will be shown that orders can't proceed.
+
+
+Usability (Desktop and Mobile)
+Devices and Browsers
+   1.​ Windows - Chrome, Firefox, Microsoft Edge Chromium PASS / FAIL
+   2.​ Mac - Chrome, Firefox, Safari, Microsoft Edge Chromium PASS / FAIL
+   3.​ iOS -
+            A)​ iPad 6th Gen or iPad Mini4, iPad Pro, iPad Air PASS / FAIL
+            B)​ iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15
+                Plus PASS / FAIL
+   4.​ Android
+            A)​ Samsung Galaxy s9 TAB
+            B)​ Pixel 9, Galaxy S21 FE, Galaxy A13 PASS/FAIL
+
+
+    5. In-app browser testing for Android and IOS devices both PASS / FAIL
+            A.​ Facebook. (Test The offer Site by appending the Affiliate ID in the offer link)
+            B.​ Skype (Check the Thumbnail in the chat window)
+    6. Dark Mode
+            A.​ Android (Both in A13 and S21 FE)
+            B.​ Ios (Any of the iPhone 12/13/14 Promax)
+            ** Android In APP can be checked in Dark Mode
+
+
+
+    7. IOS/Android zoom issue PASS / FAIL
+        Steps for IOS devices
+
+
+
+
+                                                                                                                1
+               a) open the website in Chrome/Firefox browser<click anywhere or in prospect
+               form<rotate into landscape mode with opened keypad<Again rotate into portrait
+               mode.
+               b) The same needs to be checked for all the pop-ups (Error, what’s this, Privacy
+               Policy, Contact and Terms, etc.)
+           Steps for Android devices
+                  a) Open the website in Firefox browsers
+                  b) Open the website in Chrome and try to zoom via tapping the
+                       screen, the website should not take a zoom effect
+
+
+8. Open Graph Information for Multiple Social Media Platforms:
+
+  ​      Open https://www.opengraph.xyz/ and add the offer link/project page link in “Enter Full
+URL” input box and then click on “Check Website”. Take a screenshot of the page and also the
+page link then paste that below.
+
+
+UI/UX Friendliness and Responsiveness (Desktop and Mobile)
+      1.​ Different form elements, placeholders, and labels (wherever applicable) should be
+         prominent and properly visible on different devices. PASS / FAIL
+      2.​ Action buttons should be properly accessible based on the viewport PASS / FAIL
+      3.​ Quickly visible spelling & grammar PASS / FAIL
+      4.​ Tab indexing PASS / FAIL
+      5.​ Privacy/terms/contact/Error popup(for both prospect & billing form) content & it’s popup
+         quality check in both portrait & Landscape mode.(Check this for Mobile and desktop both.)
+         PASS / FAIL
+      6.​ Favicon check: PASS / FAIL
+      7.​ Responsiveness Check with the help of browser emulation PASS / FAIL
+      8.​ In the Footer Section Copyright Should be mentioned properly on every page in Desktop
+         and Mobile. PASS / FAIL
+
+
+
+Functional (Desktop and Mobile)
+      1.​ Mandatory and optional field validation PASS / FAIL
+      2.​ Field allowed character length validation PASS / FAIL
+      3.​ Field type-wise value validation (e.g. email, phone, etc.) PASS / FAIL
+
+
+                                                                                                     2
+  4.​ Proper error messages should be showing PASS / FAIL
+  5.​ Country-wise proper state population PASS / FAIL
+  6.​ Country-wise zip code validation PASS / FAIL
+  7.​ City and state auto-population according to zip code. NA
+  8.​ Check whether the order is processed or not for the stateless country if the user keeps the
+     state field blank (Requirement specific) NA
+  9.​ Input masking for phone no. NA
+        A.​ If Input masking is present check phone no. validation that it is accepting less than
+             10 digits
+        B.​ Check whether Phone no. masking disappears or not
+                ●​ Step 1: Enter Phone no. in phone no. field
+                ●​ Step 2: Click on any field placed before phone no.
+                ●​ Step 3: Try to go to the phone no—field by Pressing the TAB button.
+  10. Input masking for Canada zip code (if the offer is for Canada) NA
+  11. Xverify functionality test based on email, address, and phone no. etc. -
+      Requirement-specific NA
+
+  12. Session Testing PASS / FAIL
+  15. Check the card expiry date for a one-time product, the order should be processed if
+      the user chooses the card expiry date one month ahead of the current date. PASS /
+      FAIL
+  16. Credit card validation and placeholder (if any) working properly in different
+      browsers/devices PASS / FAIL
+     18. If the PayPal payment option is present on a single checkout page (ie. Billing
+      shipping form on the same page) NA
+        ●​ Check whether Error Popups are showing or not if the User clicks on the Paypal
+             button by keeping Shipping and billing forms blank
+   19. Check the payment process flow redirection for Apple Pay, Google Pay and
+      Paypal. NA
+   20. Check that the user is not able to back via the Browser back button PASS / FAIL
+       Check from checkout, upsell pages, and Thank you page. (From all the browsers)
+
+
+
+CRM End check (Desktop and Mobile)
+  2.​ Check the flows working properly with their campaign ID (Desktop and Mobile)
+
+
+
+                                                                                                3
+            Test Card:
+            --------------------------------------------------
+            1444444444444441 => Decline | VISA
+            1444444444444445 => Decline | Master
+            1444444444444442 => Prepaid | VISA
+            1444444444444446 => Prepaid | Master
+            1444444444444440 => Regular | VISA
+            1444444444444443 => Regular | Master
+            4147090000000001 => Regular | VISA BSB
+            5156760000000001 => Regular | Master BSB
+
+
+
+
+Console Issues (Desktop and Mobile)
+
+  A.​ 404 Issues in JS Console[Ref Point - B]
+  B.​ Javascript Uncaught Exceptions
+
+Desktop - PASS / FAIL
+
+CHROME
+
+
+
+
+Mobile: PASS / FAIL
+
+
+
+  C.​ Verify that Ajax Should not trigger Multiple Times
+         ●​ Upon button click, multiple requests should not be triggered.
+         ●​ Multiple requests should not trigger by hitting the enter button forcefully multiple
+            times after the loader moves for the 1st time. (check this for all the buttons/banner
+            clicks)
+         ●​ Multiple requests should not trigger by hitting the space button forcefully multiple
+            times.
+         ●​ Multiple requests should not trigger upon an upsell button/banner click.
+
+
+                                                                                                   4
+Desktop - PASS / FAIL
+
+
+
+
+Mobile: PASS / FAIL
+
+
+
+
+Security and Performance
+
+  1.​ On page load, the URL should force to HTTPS if opened with HTTP URL PASS / FAIL
+  2.​ Robots.txt check: PASS / FAIL
+  3.​ SSl checking: PASS / FAIL
+  4.​ SEO checking: PASS / FAIL
+
+
+
+
+                                                                                        5
+
