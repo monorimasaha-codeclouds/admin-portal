@@ -1,14 +1,15 @@
-const express = require('require');
+const express = require('express');
 const router = express.Router();
-const db = require('../db');
-const { requireAuth } = require('../middleware/adminAuth');
+const db = require('../config/db');
+const authMiddleware = require('../middleware/auth');
+const adminAuth = require('../middleware/adminAuth');
 const { generateTestReport } = require('../utils/pdfGenerator');
 const fs = require('fs');
 const path = require('path');
 
 // GET /api/reports/download/:projectId
 // Generate (or return cached) PDF report for a project and stream it as an attachment
-router.get('/download/:projectId', requireAuth, async (req, res) => {
+router.get('/download/:projectId', authMiddleware, async (req, res) => {
     try {
         const [projects] = await db.execute('SELECT id, project_name FROM projects WHERE id = ?', [req.params.projectId]);
         if (projects.length === 0) {
@@ -18,22 +19,22 @@ router.get('/download/:projectId', requireAuth, async (req, res) => {
 
         // Fetch First URL from project_links to use as the offer link for the test report
         const [links] = await db.execute('SELECT url FROM project_links WHERE project_id = ? ORDER BY id ASC LIMIT 1', [project.id]);
-        
+
         // If there is no link, fallback to a dummy link so report still generates
         const offerUrl = links.length > 0 ? links[0].url : 'https://example.com/missing-url';
 
         // Check if report already exists in temp dir to avoid regenerating immediately (basic caching)
         // In a real app we'd regenerate on request or have a specific "Generate New" button
         const reportPath = path.join(__dirname, `../../reports/${project.id}_report.pdf`);
-        
+
         let finalPath = reportPath;
         if (!fs.existsSync(reportPath)) {
-             // Generate the report via puppeteer
-             finalPath = await generateTestReport({
-                 projectId: project.id,
-                 projectName: project.project_name,
-                 offerUrl: offerUrl
-             });
+            // Generate the report via puppeteer
+            finalPath = await generateTestReport({
+                projectId: project.id,
+                projectName: project.project_name,
+                offerUrl: offerUrl
+            });
         }
 
         // Send the PDF file to the client for download
