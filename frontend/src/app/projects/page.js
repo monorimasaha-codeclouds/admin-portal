@@ -12,6 +12,7 @@ export default function ProjectsPage() {
   const [error, setError] = useState('');
   const [deleteId, setDeleteId] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [runningId, setRunningId] = useState(null);
 
   useEffect(() => {
     loadProjects();
@@ -66,6 +67,20 @@ export default function ProjectsPage() {
       setError('Failed to download PDF. Ensure the backend is running.');
     } finally {
       setDownloadingId(null);
+    }
+  };
+
+  const handleRun = async (id) => {
+    setRunningId(id);
+    setError('');
+    try {
+      const data = await api.runProjectAutomation(id);
+      alert('Automation completed successfully. You can now download the updated PDF report.');
+      console.log('Automation results:', data.results);
+      loadProjects(); // Refresh to get final status and maybe some other data
+    } catch (err) {
+      setError('Automation failed: ' + err.message);
+      loadProjects();
     }
   };
 
@@ -157,6 +172,14 @@ export default function ProjectsPage() {
                         >
                           View
                         </Link>
+                          <button
+                            onClick={() => handleRun(project.id)}
+                            className="btn-secondary"
+                            style={{ padding: '6px 12px', fontSize: '12px', backgroundColor: '#10b981', color: 'white', border: 'none' }}
+                            disabled={runningId === project.id || project.status === 'testing'}
+                          >
+                            {runningId === project.id || project.status === 'testing' ? 'Running...' : 'Run'}
+                          </button>
                           <button
                             onClick={() => handleDownload(project.id)}
                             className="btn-primary"

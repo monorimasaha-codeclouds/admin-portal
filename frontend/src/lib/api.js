@@ -82,13 +82,44 @@ class ApiClient {
     });
   }
 
-  // Reports
-  async getReports(projectId) {
-    return this.request(`/projects/${projectId}/reports`);
+  async runProject(id) {
+    return this.request(`/projects/${id}/run`, {
+      method: 'POST',
+    });
   }
 
-  getReportDownloadUrl(reportId) {
-    return `${this.baseUrl}/reports/${reportId}/download`;
+  async runProjectAutomation(id) {
+    return this.request(`/projects/${id}/run`, {
+      method: 'POST',
+    });
+  }
+
+  // Reports
+  async downloadReport(projectId) {
+    const url = `${this.baseUrl}/reports/download/${projectId}`;
+    const token = this.getToken();
+    
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(url, { headers });
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to download report');
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', `Project_${projectId}_Report.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(downloadUrl);
   }
 
   // Users Management (Admin)

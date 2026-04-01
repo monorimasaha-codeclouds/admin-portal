@@ -4,266 +4,477 @@
     <meta charset="UTF-8">
     <title>Test Report - <%= projectName %></title>
     <style>
+        @font-face {
+            font-family: 'Proxima Nova';
+            src: local('Segoe UI'), local('Roboto'), local('Helvetica Neue'), sans-serif;
+        }
+
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: 'Proxima Nova', 'Segoe UI', Arial, sans-serif;
             color: #333;
-            line-height: 1.6;
+            line-height: 1.4;
             margin: 0;
-            padding: 40px;
-            font-size: 13px;
+            padding: 20px 0; /* Space for fixed header/footer if any */
+            font-size: 11pt;
         }
-        h1 {
+
+        /* Header and Footer */
+        .header-bar {
+            background-color: #ADD8E6;
+            height: 15px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        .footer-bar {
+            background-color: #ADD8E6;
+            height: 30px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            font-size: 10pt;
             color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+        }
+
+        .content-container {
+            padding: 40px 50px;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Verdana Bold', Verdana, Geneva, sans-serif;
+            font-weight: bold;
+            color: #000;
+        }
+
+        h1 {
+            font-size: 18pt;
             text-align: center;
+            margin-bottom: 30px;
         }
+
         h2 {
-            color: #2980b9;
-            margin-top: 30px;
-            border-bottom: 1px solid #bdc3c7;
-            padding-bottom: 5px;
+            font-size: 14pt;
+            margin-top: 40px;
+            border-bottom: none;
+            padding-bottom: 0;
         }
+
         h3 {
-            color: #34495e;
-            margin-top: 20px;
+            font-size: 12pt;
+            margin-top: 25px;
         }
+
         .note {
-            background-color: #fce4ec;
-            color: #c2185b;
-            padding: 10px;
-            border-left: 4px solid #c2185b;
+            background-color: #fff;
+            color: #c0392b;
+            padding: 0;
+            border-left: none;
             margin-bottom: 20px;
-            font-style: italic;
-            font-size: 12px;
+            font-weight: bold;
+            font-size: 11pt;
         }
+
         .offer-link {
-            background-color: #f7f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            word-wrap: break-word;
-            border: 1px solid #e1e8ed;
-            margin-bottom: 15px;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            font-size: 11pt;
         }
-        .pass { color: #27ae60; font-weight: bold; }
+
+        .pass { color: #27ae60; font-weight: bold; text-decoration: underline; }
         .fail { color: #c0392b; font-weight: bold; }
         .na { color: #7f8c8d; font-weight: bold; }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 5px; }
         
-        /* Screenshot Formatting like Reference PDF */
+        ul { padding-left: 25px; list-style-type: decimal; }
+        ul ul { list-style-type: upper-alpha; padding-left: 20px; }
+        li { margin-bottom: 10px; }
+        
+        /* Screenshot and Table Borders */
         .screenshot-container {
-            margin: 15px 0 30px 0;
-            text-align: left;
+            margin: 20px 0;
+            text-align: center;
         }
+
         .screenshot-container img {
-            max-width: 90%;
-            border: 1px solid #ccc;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 100%;
+            border: 4px solid #c0392b; /* Default to Red Failure Border */
             display: block;
-            margin-top: 10px;
+            margin: 0 auto;
         }
+
+        .screenshot-container.success img {
+            border-color: #2ecc71; /* Green Success Border */
+        }
+
         .screenshot-caption {
             font-style: italic;
             color: #7f8c8d;
-            font-size: 11px;
-            margin-top: 5px;
+            font-size: 10pt;
+            margin-top: 10px;
+        }
+
+        .table-container {
+            border: 3px solid #2ecc71; /* Success border */
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        .table-container.fail {
+            border-color: #c0392b;
         }
         
         .page-break {
             page-break-before: always;
         }
+
+        .issue-text {
+            color: #c0392b;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Automated Test Report: <%= projectName %></h1>
+    <div class="header-bar"></div>
+    <div class="footer-bar"><!-- Page number will be here if handled by Puppeteer or CSS --></div>
 
-    <div class="note">
-        Note: According to the discussion with the developer, only robots.txt and HTTPS is checked for security testing in this test report.
-    </div>
+    <div class="content-container">
+        <h1>Automated Test Report: <%= projectName %></h1>
 
-    <h2>[A] Offer Funnel</h2>
-    <div class="offer-link">
-        <strong>URL:</strong> <a href="<%= offerUrl %>"><%= offerUrl %></a>
-    </div>
-    <ul>
-        <% if (funnelNotes.length > 0) { %>
-            <% funnelNotes.forEach((note, index) => { %>
-                <li><%= index + 1 %>. <%= note %></li>
+        <div class="issue-text" style="font-size: 11pt; margin-bottom: 20px;">
+            Note: According to the discussion with the developer, only robots.txt and HTTPS is checked for security testing in this test report.
+        </div>
+
+        <h2>[A] Offer Funnel</h2>
+        <div class="offer-link">
+            <strong>URL:</strong> <a href="<%= offerUrl %>"><%= offerUrl %></a>
+        </div>
+        <ul>
+            <% if (funnelNotes.length > 0) { %>
+                <% funnelNotes.forEach((note, index) => { %>
+                    <li><%= index + 1 %>. <%= note %></li>
+                <% }); %>
+            <% } %>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <h2>Usability (Desktop and Mobile)</h2>
+        <h3>Devices and Browsers</h3>
+        
+        <!-- Windows Desktop -->
+        <ul>
+            <li>1. Windows - Chrome, Firefox, Microsoft Edge Chromium <span class="<%= usability.windows.status.toLowerCase() %>"><%= usability.windows.status %></span>
+                <ul>
+                    <li class="issue-text">The images are pixelated</li>
+                    <li class="issue-text">The images should be middle aligned</li>
+                </ul>
+            </li>
+        </ul>
+        <% if (images && images.desktop) { %>
+            <div class="screenshot-container <%= usability.windows.status.toLowerCase() === 'pass' ? 'success' : '' %>">
+                <img src="<%= images.desktop %>" alt="Desktop Screenshot" />
+                <div class="screenshot-caption">Fig 1: Windows Desktop Context</div>
+            </div>
+        <% } %>
+
+        <!-- Mac Desktop -->
+        <ul>
+            <li>2. Mac - Chrome, Firefox, Safari, Microsoft Edge Chromium <span class="<%= usability.mac.status.toLowerCase() %>"><%= usability.mac.status %></span></li>
+        </ul>
+
+        <!-- iOS Section -->
+        <ul>
+            <li>3. iOS -
+                <ul>
+                    <li>A) iPad 6th Gen or iPad Mini4, iPad Pro, iPad Air <span class="<%= usability.ios.ipad.toLowerCase() %>"><%= usability.ios.ipad %></span>
+                        <ul>
+                            <li class="issue-text">Blank space showing below footer</li>
+                        </ul>
+                        <% if (images && images.ipad) { %>
+                            <div class="screenshot-container <%= usability.ios.ipad.toLowerCase() === 'pass' ? 'success' : '' %>">
+                                <img src="<%= images.ipad %>" alt="iPad Screenshot" style="max-width: 60%;" />
+                                <div class="screenshot-caption">Fig 2: iPad Layout Issue</div>
+                            </div>
+                        <% } %>
+                    </li>
+
+                    <li>B) iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15 Plus <span class="<%= usability.ios.iphone.toLowerCase() %>"><%= usability.ios.iphone %></span>
+                        <ul>
+                            <li class="issue-text">The placeholder is showing cropped</li>
+                            <li class="issue-text">The cross icon needs to be middle aligned</li>
+                        </ul>
+                        <% if (images && images.iphone) { %>
+                            <div class="screenshot-container <%= usability.ios.iphone.toLowerCase() === 'pass' ? 'success' : '' %>">
+                                <img src="<%= images.iphone %>" alt="iPhone Screenshot" style="max-width: 45%;" />
+                                <div class="screenshot-caption">Fig 3: iPhone Layout Issue</div>
+                            </div>
+                        <% } %>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <!-- Android Section -->
+        <ul>
+            <li>4. Android
+                <ul>
+                    <li>A) Samsung Galaxy s9 TAB <span class="<%= usability.android.tablet.toLowerCase() %>"><%= usability.android.tablet %></span></li>
+                    <li>B) Pixel 9, Galaxy S21 FE, Galaxy A13 <span class="<%= usability.android.phone.toLowerCase() %>"><%= usability.android.phone %></span>
+                        <ul>
+                            <li class="issue-text">The pop up should fit inside a single window</li>
+                        </ul>
+                        <% if (images && images.android) { %>
+                            <div class="screenshot-container <%= usability.android.phone.toLowerCase() === 'pass' ? 'success' : '' %>">
+                                <img src="<%= images.android %>" alt="Android Screenshot" style="max-width: 45%;" />
+                                <div class="screenshot-caption">Fig 4: Android Viewport Overlap</div>
+                            </div>
+                        <% } %>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+
+
+        <h3>5. In-app browser testing for Android and IOS devices both <span class="pass">PASS</span></h3>
+        <ul>
+            <li>A. Facebook. (Test The offer Site by appending the Affiliate ID in the offer link)</li>
+            <li>B. Skype (Check the Thumbnail in the chat window)</li>
+        </ul>
+
+        <h3>6. Dark Mode</h3>
+        <ul>
+            <li>A. Android (Both in A13 and S21 FE)</li>
+            <li>B. Ios (Any of the iPhone 12/13/14 Promax)</li>
+        </ul>
+
+        <h3>7. IOS/Android zoom issue <span class="<%= usability.zoomIssue.toLowerCase() %>"><%= usability.zoomIssue %></span></h3>
+        <p>Steps for IOS and Android verified.</p>
+
+        <h3>8. Open Graph Information for Multiple Social Media Platforms: <span class="pass">PASS</span></h3>
+        <p>Report Link Generated via www.opengraph.xyz</p>
+
+        <div class="page-break"></div>
+
+        <h2>UI/UX Friendliness and Responsiveness (Desktop and Mobile)</h2>
+        <ul>
+            <li>1. Different form elements, placeholders, and labels visible: <span class="<%= uiUx.formElements.toLowerCase() %>"><%= uiUx.formElements %></span></li>
+            <li>2. Action buttons should be properly accessible based on the viewport: <span class="<%= uiUx.buttonsAccessible.toLowerCase() %>"><%= uiUx.buttonsAccessible %></span></li>
+            <li>3. Quickly visible spelling & grammar: <span class="<%= uiUx.spelling.toLowerCase() %>"><%= uiUx.spelling %></span></li>
+            <li>4. Tab indexing: <span class="<%= uiUx.tabIndexing.toLowerCase() %>"><%= uiUx.tabIndexing %></span></li>
+            <li>5. Privacy/terms/contact/Error popup visibility context: <span class="<%= uiUx.popups.toLowerCase() %>"><%= uiUx.popups %></span></li>
+            <li>6. Favicon check: <span class="<%= uiUx.favicon.toLowerCase() %>"><%= uiUx.favicon %></span></li>
+            <li>7. Responsiveness Check with the help of browser emulation: <span class="<%= uiUx.responsiveness.toLowerCase() %>"><%= uiUx.responsiveness %></span></li>
+            <li>8. In the Footer Section Copyright Should be properly mentioned: <span class="<%= uiUx.copyright.toLowerCase() %>"><%= uiUx.copyright %></span></li>
+        </ul>
+
+        <h2>Functional (Desktop and Mobile)</h2>
+        <ul>
+            <li>1. Mandatory and optional field validation: <span class="pass">PASS</span></li>
+            <li>2. Field allowed character length validation: <span class="pass">PASS</span></li>
+            <li>3. Field type-wise value validation: <span class="pass">PASS</span></li>
+            <li>4. Proper error messages should be showing: <span class="fail">FAIL</span></li>
+            <li>5. Proper Error message should appear after processing order with Decline card: <span class="fail">FAIL</span></li>
+            <li>6. Country-wise proper state population: <span class="fail">FAIL</span></li>
+            <li>7. Country-wise zip code validation: <span class="pass">PASS</span></li>
+            <li>8. City and state auto-population according to zip code: <span class="na">NA</span></li>
+            <li>9. Check whether the order is processed or not for the stateless country: <span class="na">NA</span></li>
+            <li>10. Input masking for phone no: <span class="na">NA</span></li>
+            <li>11. Input masking for Canada zip code: <span class="na">NA</span></li>
+            <li>12. Xverify functionality test: <span class="na">NA</span></li>
+            <li>13. Session Testing: <span class="pass">PASS</span></li>
+            <li>15. Prospect form after product selection page constraints: <span class="pass">PASS</span></li>
+            <li>16. Check the card expiry date for a one-time product ahead of current date: <span class="pass">PASS</span></li>
+            <li>17. Credit card validation and placeholder: <span class="pass">PASS</span></li>
+            <li>19. PayPal payment option on checkout: <span class="na">NA</span></li>
+            <li>20. Apple Pay, Google Pay and Paypal redirection: <span class="na">NA</span></li>
+            <li>21. Back via Browser back button constraint: <span class="fail">FAIL</span></li>
+        </ul>
+
+        <div class="page-break"></div>
+
+        <h2>CRM End check (Desktop and Mobile)</h2>
+        <ul>
+            <li>2. Check the flows working properly with their campaign ID (Desktop and Mobile) <br><br>
+                <strong class="issue-text">Note:</strong> Products are being placed under the Main Campaign in CRM instead of the Decline Campaign as mentioned in the email.
+            </li>
+        </ul>
+
+        <h2>Console Issues (Desktop and Mobile)</h2>
+
+        <%
+            // Compute dynamic console issue stats
+            const desktopErrors = (consoleIssues && consoleIssues.desktop || []).reduce((sum, p) => sum + p.errors.length, 0);
+            const desktopWarnings = (consoleIssues && consoleIssues.desktop || []).reduce((sum, p) => sum + p.warnings.length, 0);
+            const mobileErrors = (consoleIssues && consoleIssues.mobile || []).reduce((sum, p) => sum + p.errors.length, 0);
+            const mobileWarnings = (consoleIssues && consoleIssues.mobile || []).reduce((sum, p) => sum + p.warnings.length, 0);
+
+            const has404Desktop = (consoleIssues && consoleIssues.desktop || []).some(p => p.errors.some(e => e.text && e.text.includes('404')));
+            const has404Mobile = (consoleIssues && consoleIssues.mobile || []).some(p => p.errors.some(e => e.text && e.text.includes('404')));
+            const has404 = has404Desktop || has404Mobile;
+
+            const hasUncaughtDesktop = desktopErrors > 0;
+            const hasUncaughtMobile = mobileErrors > 0;
+        %>
+
+        <ul>
+            <li>A. 404 Issues in JS Console: <span class="<%= has404 ? 'fail' : 'pass' %>"><%= has404 ? 'FAIL' : 'PASS' %></span></li>
+            <li>B. Javascript Uncaught Exceptions
+                <ul>
+                    <li>Desktop: <span class="<%= hasUncaughtDesktop ? 'fail' : 'pass' %>"><%= hasUncaughtDesktop ? 'FAIL' : 'PASS' %></span>
+                        <% if (!hasUncaughtDesktop) { %> (No issue found)<% } %>
+                    </li>
+                    <li>Mobile: <span class="<%= hasUncaughtMobile ? 'fail' : 'pass' %>"><%= hasUncaughtMobile ? 'FAIL' : 'PASS' %></span>
+                        <% if (!hasUncaughtMobile) { %> (No issue found)<% } %>
+                    </li>
+                </ul>
+            </li>
+            <li>C. Console Warnings
+                <ul>
+                    <li>Desktop: <span class="<%= desktopWarnings > 0 ? 'fail' : 'pass' %>"><%= desktopWarnings > 0 ? 'FAIL (' + desktopWarnings + ' warning' + (desktopWarnings !== 1 ? 's' : '') + ')' : 'PASS' %></span></li>
+                    <li>Mobile: <span class="<%= mobileWarnings > 0 ? 'fail' : 'pass' %>"><%= mobileWarnings > 0 ? 'FAIL (' + mobileWarnings + ' warning' + (mobileWarnings !== 1 ? 's' : '') + ')' : 'PASS' %></span></li>
+                </ul>
+            </li>
+        </ul>
+
+        <% if (consoleIssues && (consoleIssues.desktop.length > 0 || consoleIssues.mobile.length > 0)) { %>
+            <% const viewports = [
+                { name: 'Desktop', issues: consoleIssues.desktop },
+                { name: 'Mobile', issues: consoleIssues.mobile }
+            ]; %>
+
+            <% viewports.forEach(vp => { %>
+                <% const pagesWithIssues = vp.issues.filter(p => p.errors.length > 0 || p.warnings.length > 0); %>
+                <% if (pagesWithIssues.length > 0) { %>
+                    <h3 style="margin-top: 25px; color: #c0392b;"><%= vp.name %> Console Issues</h3>
+                    <% pagesWithIssues.forEach((pageIssue, idx) => { %>
+                        <div style="margin: 15px 0; padding: 15px; border: 2px solid #c0392b; border-radius: 6px; background: #fdf2f2;">
+                            <strong style="font-size: 11pt;"><%= pageIssue.pageName %></strong>
+                            <span style="color: #c0392b; font-size: 10pt; margin-left: 10px;">
+                                (<%= pageIssue.errors.length %> error<%= pageIssue.errors.length !== 1 ? 's' : '' %>,
+                                 <%= pageIssue.warnings.length %> warning<%= pageIssue.warnings.length !== 1 ? 's' : '' %>)
+                            </span>
+
+                            <% if (pageIssue.errors.length > 0) { %>
+                                <div style="margin-top: 10px;">
+                                    <strong style="color: #c0392b; font-size: 10pt;">Errors:</strong>
+                                    <ul style="list-style-type: none; padding-left: 10px; margin-top: 5px;">
+                                        <% pageIssue.errors.forEach(err => { %>
+                                            <li style="font-size: 9pt; color: #c0392b; margin-bottom: 4px; word-break: break-all;">
+                                                ⛔ <%= err.text %>
+                                                <% if (err.location) { %>
+                                                    <span style="color: #888; font-size: 8pt;"> — <%= err.location %></span>
+                                                <% } %>
+                                            </li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (pageIssue.warnings.length > 0) { %>
+                                <div style="margin-top: 10px;">
+                                    <strong style="color: #e67e22; font-size: 10pt;">Warnings:</strong>
+                                    <ul style="list-style-type: none; padding-left: 10px; margin-top: 5px;">
+                                        <% pageIssue.warnings.forEach(warn => { %>
+                                            <li style="font-size: 9pt; color: #e67e22; margin-bottom: 4px; word-break: break-all;">
+                                                ⚠️ <%= warn.text %>
+                                                <% if (warn.location) { %>
+                                                    <span style="color: #888; font-size: 8pt;"> — <%= warn.location %></span>
+                                                <% } %>
+                                            </li>
+                                        <% }); %>
+                                    </ul>
+                                </div>
+                            <% } %>
+
+                            <% if (pageIssue.screenshotPath) { %>
+                                <div class="screenshot-container" style="margin-top: 15px;">
+                                    <img src="<%- pageIssue.screenshotPath %>" alt="Console Issues - <%= vp.name %> - <%= pageIssue.pageName %>" style="border: 3px solid #c0392b;" />
+                                    <div class="screenshot-caption">Fig: <%= vp.name %> Console — <%= pageIssue.pageName %></div>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                <% } %>
             <% }); %>
         <% } %>
-    </ul>
 
-    <div class="page-break"></div>
+        <h2>Security and Performance</h2>
+        <ul>
+            <li>1. On page load, the URL should force to HTTPS: <span class="<%= autoChecks.https.toLowerCase() %>"><%= autoChecks.https %></span></li>
+            <li>2. Robots.txt check: <span class="<%= autoChecks.robotsTxt.toLowerCase() %>"><%= autoChecks.robotsTxt %></span></li>
+            <% if (autoChecks.robotsTxtScreenshot) { %>
+                <div class="screenshot-container success" style="margin-top: 10px;">
+                    <img src="<%= autoChecks.robotsTxtScreenshot %>" alt="Robots.txt Screenshot" style="border-width: 2px; border-color: #2ecc71; max-width: 80%;" />
+                    <div class="screenshot-caption">Fig: robots.txt file found on domain</div>
+                </div>
+            <% } %>
+            <li>3. SSl checking: <span class="pass">PASS</span></li>
+            <li>4. SEO checking: <span class="pass">PASS</span></li>
+        </ul>
 
-    <h2>Usability (Desktop and Mobile)</h2>
-    <h3>Devices and Browsers</h3>
-    
-    <!-- Windows Desktop -->
-    <ul>
-        <li>1. Windows - Chrome, Firefox, Microsoft Edge Chromium <span class="<%= usability.windows.status.toLowerCase() %>"><%= usability.windows.status %></span>
-            <ul>
-                <li>The images are pixelated</li>
-                <li>The images should be middle aligned</li>
-            </ul>
-        </li>
-    </ul>
-    <% if (images && images.desktop) { %>
-        <div class="screenshot-container">
-            <img src="<%= images.desktop %>" alt="Desktop Screenshot" />
-            <div class="screenshot-caption">Fig 1: Windows Desktop Context</div>
-        </div>
-    <% } %>
+        <% if (automationResults && automationResults.length > 0) { %>
+            <div class="page-break"></div>
+            <h2 style="color: #27ae60; border-bottom: 2px solid #27ae60; padding-bottom: 5px;">[B] Automated Checkout Verification</h2>
+            <p>This section documents the end-to-end automated purchase flow, confirming the transition from the Landing Page to the final Thank You / Confirmation page.</p>
 
-    <!-- Mac Desktop -->
-    <ul>
-        <li>2. Mac - Chrome, Firefox, Safari, Microsoft Edge Chromium <span class="<%= usability.mac.status.toLowerCase() %>"><%= usability.mac.status %></span></li>
-    </ul>
-
-    <!-- iOS Section -->
-    <ul>
-        <li>3. iOS -
-            <ul>
-                <li>A) iPad 6th Gen or iPad Mini4, iPad Pro, iPad Air <span class="<%= usability.ios.ipad.toLowerCase() %>"><%= usability.ios.ipad %></span>
-                    <ul>
-                        <li>Blank space showing below footer</li>
-                    </ul>
-                    <% if (images && images.ipad) { %>
-                        <div class="screenshot-container">
-                            <img src="<%= images.ipad %>" alt="iPad Screenshot" style="max-width: 60%;" />
-                            <div class="screenshot-caption">Fig 2: iPad Layout Issue</div>
+            <% automationResults.forEach((result, index) => { %>
+                <div style="margin-bottom: 40px; border: 2px solid #ddd; padding: 25px; border-radius: 8px;" class="<%= (result.error || result.url.includes('checkout')) ? 'table-container fail' : '' %>">
+                    <h3 style="margin-top: 0; color: #2c3e50;">Test Scenario #<%= index + 1 %>: Card Ending in <%= result.card_number.slice(-4) %></h3>
+                    
+                    <% if (result.error) { %>
+                        <div style="background: #fdf2f2; padding: 15px; border-radius: 5px; border-left: 5px solid #c0392b; margin-bottom: 20px;">
+                            <strong style="color: #c0392b;">Automation Alert:</strong> <span style="color: #333;"><%= result.error %></span>
                         </div>
                     <% } %>
-                </li>
 
-                <li>B) iPhone 7 or 8, iPhone 13 or 12, iPhone 14 Pro Max, iPhone 16 Plus or iPhone 15 Plus <span class="<%= usability.ios.iphone.toLowerCase() %>"><%= usability.ios.iphone %></span>
-                    <ul>
-                        <li>The placeholder is showing cropped</li>
-                        <li>The cross icon needs to be middle aligned</li>
-                    </ul>
-                    <% if (images && images.iphone) { %>
-                        <div class="screenshot-container">
-                            <img src="<%= images.iphone %>" alt="iPhone Screenshot" style="max-width: 45%;" />
-                            <div class="screenshot-caption">Fig 3: iPhone Layout Issue</div>
+                    <div style="display: flex; gap: 20px; justify-content: space-between;">
+                        <div style="width: 48%;">
+                            <strong style="display: block; margin-bottom: 10px; font-size: 11pt;">1. Landing Page Snapshot:</strong>
+                            <% if (result.landing_page_screenshot) { %>
+                                <div class="screenshot-container success" style="margin: 0;">
+                                    <img src="<%- result.landing_page_screenshot %>" alt="Landing Page" style="border-width: 2px; border-color: #3498db;" />
+                                </div>
+                            <% } else { %>
+                                <p style="color: #95a5a6;">N/A</p>
+                            <% } %>
                         </div>
-                    <% } %>
-                </li>
-            </ul>
-        </li>
-    </ul>
-
-    <div class="page-break"></div>
-
-    <!-- Android Section -->
-    <ul>
-        <li>4. Android
-            <ul>
-                <li>A) Samsung Galaxy s9 TAB <span class="<%= usability.android.tablet.toLowerCase() %>"><%= usability.android.tablet %></span></li>
-                <li>B) Pixel 9, Galaxy S21 FE, Galaxy A13 <span class="<%= usability.android.phone.toLowerCase() %>"><%= usability.android.phone %></span>
-                    <ul>
-                        <li>The pop up should fit inside a single window</li>
-                    </ul>
-                    <% if (images && images.android) { %>
-                        <div class="screenshot-container">
-                            <img src="<%= images.android %>" alt="Android Screenshot" style="max-width: 45%;" />
-                            <div class="screenshot-caption">Fig 4: Android Viewport Overlap</div>
+                        <div style="width: 48%;">
+                            <% 
+                                const isSuccess = !result.error && (result.url.includes('thankyou') || result.url.includes('thank-you') || result.url.includes('confirm'));
+                            %>
+                            <strong style="display: block; margin-bottom: 10px; font-size: 11pt; color: <%= isSuccess ? '#27ae60' : '#c0392b' %>;">
+                                2. Final Page Snapshot (<%= isSuccess ? 'PASS' : 'FAIL' %>):
+                            </strong>
+                            <% if (result.screenshot) { %>
+                                <div class="screenshot-container <%= isSuccess ? 'success' : '' %>" style="margin: 0;">
+                                    <img src="<%- result.screenshot %>" alt="Final Page" style="border-width: 4px; border-color: <%= isSuccess ? '#27ae60' : '#c0392b' %>;" />
+                                </div>
+                            <% } else { %>
+                                <p style="color: #95a5a6;">Missing Final Snapshot</p>
+                            <% } %>
                         </div>
-                    <% } %>
-                </li>
-            </ul>
-        </li>
-    </ul>
+                    </div>
 
-
-    <h3>5. In-app browser testing for Android and IOS devices both <span class="pass">PASS</span></h3>
-    <ul>
-        <li>A. Facebook. (Test The offer Site by appending the Affiliate ID in the offer link)</li>
-        <li>B. Skype (Check the Thumbnail in the chat window)</li>
-    </ul>
-
-    <h3>6. Dark Mode</h3>
-    <ul>
-        <li>A. Android (Both in A13 and S21 FE)</li>
-        <li>B. Ios (Any of the iPhone 12/13/14 Promax)</li>
-    </ul>
-
-    <h3>7. IOS/Android zoom issue <span class="<%= usability.zoomIssue.toLowerCase() %>"><%= usability.zoomIssue %></span></h3>
-    <p>Steps for IOS and Android verified.</p>
-
-    <h3>8. Open Graph Information for Multiple Social Media Platforms: <span class="pass">PASS</span></h3>
-    <p>Report Link Generated via www.opengraph.xyz</p>
-
-    <div class="page-break"></div>
-
-    <h2>UI/UX Friendliness and Responsiveness (Desktop and Mobile)</h2>
-    <ul>
-        <li>1. Different form elements, placeholders, and labels visible: <span class="<%= uiUx.formElements.toLowerCase() %>"><%= uiUx.formElements %></span></li>
-        <li>2. Action buttons should be properly accessible based on the viewport: <span class="<%= uiUx.buttonsAccessible.toLowerCase() %>"><%= uiUx.buttonsAccessible %></span></li>
-        <li>3. Quickly visible spelling & grammar: <span class="<%= uiUx.spelling.toLowerCase() %>"><%= uiUx.spelling %></span></li>
-        <li>4. Tab indexing: <span class="<%= uiUx.tabIndexing.toLowerCase() %>"><%= uiUx.tabIndexing %></span></li>
-        <li>5. Privacy/terms/contact/Error popup visibility context: <span class="<%= uiUx.popups.toLowerCase() %>"><%= uiUx.popups %></span></li>
-        <li>6. Favicon check: <span class="<%= uiUx.favicon.toLowerCase() %>"><%= uiUx.favicon %></span></li>
-        <li>7. Responsiveness Check with the help of browser emulation: <span class="<%= uiUx.responsiveness.toLowerCase() %>"><%= uiUx.responsiveness %></span></li>
-        <li>8. In the Footer Section Copyright Should be properly mentioned: <span class="<%= uiUx.copyright.toLowerCase() %>"><%= uiUx.copyright %></span></li>
-    </ul>
-
-    <h2>Functional (Desktop and Mobile)</h2>
-    <ul>
-        <li>1. Mandatory and optional field validation: <span class="pass">PASS</span></li>
-        <li>2. Field allowed character length validation: <span class="pass">PASS</span></li>
-        <li>3. Field type-wise value validation: <span class="pass">PASS</span></li>
-        <li>4. Proper error messages should be showing: <span class="fail">FAIL</span></li>
-        <li>5. Proper Error message should appear after processing order with Decline card: <span class="fail">FAIL</span></li>
-        <li>6. Country-wise proper state population: <span class="fail">FAIL</span></li>
-        <li>7. Country-wise zip code validation: <span class="pass">PASS</span></li>
-        <li>8. City and state auto-population according to zip code: <span class="na">NA</span></li>
-        <li>9. Check whether the order is processed or not for the stateless country: <span class="na">NA</span></li>
-        <li>10. Input masking for phone no: <span class="na">NA</span></li>
-        <li>11. Input masking for Canada zip code: <span class="na">NA</span></li>
-        <li>12. Xverify functionality test: <span class="na">NA</span></li>
-        <li>13. Session Testing: <span class="pass">PASS</span></li>
-        <li>15. Prospect form after product selection page constraints: <span class="pass">PASS</span></li>
-        <li>16. Check the card expiry date for a one-time product ahead of current date: <span class="pass">PASS</span></li>
-        <li>17. Credit card validation and placeholder: <span class="pass">PASS</span></li>
-        <li>19. PayPal payment option on checkout: <span class="na">NA</span></li>
-        <li>20. Apple Pay, Google Pay and Paypal redirection: <span class="na">NA</span></li>
-        <li>21. Back via Browser back button constraint: <span class="fail">FAIL</span></li>
-    </ul>
-
-    <div class="page-break"></div>
-
-    <h2>CRM End check (Desktop and Mobile)</h2>
-    <ul>
-        <li>2. Check the flows working properly with their campaign ID (Desktop and Mobile) <br><br>
-            <strong>Note:</strong> Products are being placed under the Main Campaign in CRM instead of the Decline Campaign as mentioned in the email.
-        </li>
-    </ul>
-
-    <h2>Console Issues (Desktop and Mobile)</h2>
-    <ul>
-        <li>A. 404 Issues in JS Console: <span class="fail">FAIL</span></li>
-        <li>B. Javascript Uncaught Exceptions
-            <ul>
-                <li>Desktop: <span class="fail">FAIL</span></li>
-                <li>Mobile: <span class="pass">PASS</span> (No issue found)</li>
-            </ul>
-        </li>
-        <li>C. Verify that Ajax Should not trigger Multiple Times
-            <ul>
-                <li>Desktop: <span class="fail">FAIL</span></li>
-                <li>Mobile: <span class="fail">FAIL</span></li>
-            </ul>
-        </li>
-    </ul>
-
-    <h2>Security and Performance</h2>
-    <ul>
-        <li>1. On page load, the URL should force to HTTPS: <span class="<%= autoChecks.https.toLowerCase() %>"><%= autoChecks.https %></span></li>
-        <li>2. Robots.txt check: <span class="<%= autoChecks.robotsTxt.toLowerCase() %>"><%= autoChecks.robotsTxt %></span></li>
-        <li>3. SSl checking: <span class="pass">PASS</span></li>
-        <li>4. SEO checking: <span class="pass">PASS</span></li>
-    </ul>
+                    <div style="margin-top: 25px; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 5px solid <%= isSuccess ? '#27ae60' : '#c0392b' %>;">
+                        <strong style="color: #2c3e50;">Final Destination URL:</strong><br>
+                        <a href="<%= result.url %>" style="color: #2980b9; text-decoration: none; word-break: break-all; font-family: monospace; font-size: 9pt;"><%= result.url %></a>
+                        <p style="font-size: 9pt; color: #7f8c8d; margin-top: 10px; font-style: italic;">
+                            <%= isSuccess ? 'This URL confirms the user has successfully reached the conversion page.' : 'Warning: High probability of validation error or failed redirection.' %>
+                        </p>
+                    </div>
+                </div>
+            <% }); %>
+        <% } %>
+    </div>
 
 </body>
 </html>

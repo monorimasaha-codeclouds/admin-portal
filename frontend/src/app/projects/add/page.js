@@ -86,7 +86,7 @@ export default function AddProjectPage() {
       ...prev,
       first_name: firstName,
       last_name: lastName,
-      email: `${firstName.toLowerCase()}${lastName.toLowerCase()}${randomNum}@${domain}`,
+      email: `test${Math.floor(Math.random() * 20) + 1}@codeclouds.com`,
       phone: `+1 (${Math.floor(200 + Math.random() * 700)}) ${Math.floor(100 + Math.random() * 800)}-${Math.floor(1000 + Math.random() * 9000)}`
     }));
     

@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 
 // GET /api/reports/download/:projectId
-// Generate (or return cached) PDF report for a project and stream it as an attachment
 router.get('/download/:projectId', authMiddleware, async (req, res) => {
     try {
         const [projects] = await db.execute('SELECT id, project_name FROM projects WHERE id = ?', [req.params.projectId]);
@@ -27,13 +26,20 @@ router.get('/download/:projectId', authMiddleware, async (req, res) => {
         // In a real app we'd regenerate on request or have a specific "Generate New" button
         const reportPath = path.join(__dirname, `../../reports/${project.id}_report.pdf`);
 
+        // Fetch automation results from DB to include in the PDF
+        const [reports] = await db.execute('SELECT screenshots_json FROM test_reports WHERE project_id = ? ORDER BY created_at DESC LIMIT 1', [project.id]);
+        const automationResults = reports.length > 0 ? reports[0].screenshots_json : null;
+
         let finalPath = reportPath;
-        if (!fs.existsSync(reportPath)) {
+        // Always regenerate if the user just ran automation, or if file doesn't exist
+        // For now, let's keep the caching but check if we have results to include
+        if (!fs.existsSync(reportPath) || automationResults) {
             // Generate the report via puppeteer
             finalPath = await generateTestReport({
                 projectId: project.id,
                 projectName: project.project_name,
-                offerUrl: offerUrl
+                offerUrl: offerUrl,
+                automationResults: automationResults // Pass the results here
             });
         }
 
