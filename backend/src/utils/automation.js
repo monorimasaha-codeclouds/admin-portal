@@ -317,12 +317,22 @@ async function runAutomation(project, cards) {
 
     // ── Phase 1: Mobile Console Check (as requested in previous logic) ──
     try {
-        const mobileBrowser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
-        });
+        let mobileBrowser;
+        const token = process.env.BROWSERLESS_TOKEN;
+        
+        if (token) {
+            console.log('[Automation] Connecting to Browserless.io...');
+            mobileBrowser = await puppeteer.connect({
+                browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
+            });
+        } else {
+            mobileBrowser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
+            });
+        }
         const mobileResults = await checkConsoleForViewport(
             mobileBrowser,
             offerUrl,
@@ -340,12 +350,19 @@ async function runAutomation(project, cards) {
     for (const card of cards) {
         console.log(`[Automation] Processing card: ${card.card_number} and project url is ${offerUrl}`);
 
-        const browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
-        });
+        let browser;
+        if (token) {
+            browser = await puppeteer.connect({
+                browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
+            });
+        } else {
+            browser = await puppeteer.launch({
+                args: chromium.args,
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
+            });
+        }
 
         const context = await browser.createBrowserContext();
         const page = await context.newPage();
