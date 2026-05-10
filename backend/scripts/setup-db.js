@@ -5,7 +5,7 @@ const pool = require('../src/config/db');
 async function setupDatabase() {
   try {
     console.log('📖 Reading schema.sql...');
-    const schemaPath = path.join(__dirname, '../../database/schema.sql');
+    const schemaPath = path.join(__dirname, '../database/schema.sql');
     let schema = fs.readFileSync(schemaPath, 'utf8');
 
     // Remove the CREATE DATABASE and USE commands as they might cause issues with pre-allocated Aiven databases
