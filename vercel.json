@@ -3,7 +3,7 @@
   "functions": {
     "backend/src/index.js": {
       "memory": 1024,
-      "maxDuration": 60
+      "maxDuration": 180
     }
   },
   "rewrites": [

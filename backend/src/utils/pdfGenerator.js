@@ -24,223 +24,158 @@ const VIEWPORTS = {
 };
 
 // Helper to Convert Image to Base64
-const toBase64 = (filePath) => {
+function toBase64(filePath) {
     if (!filePath || !fs.existsSync(filePath)) return null;
-    const b64 = fs.readFileSync(filePath, { encoding: 'base64' });
-    const ext = path.extname(filePath).replace('.', '') || 'png';
-    return `data:image/${ext};base64,${b64}`;
-};
+    const bitmap = fs.readFileSync(filePath);
+    return `data:image/png;base64,${Buffer.from(bitmap).toString('base64')}`;
+}
 
-async function generateTestReport(projectParams) {
-    const { projectId, offerUrl, projectName, automationResults } = projectParams;
-
-    console.log(`[PDF Gen] Starting report generation for Project: ${projectId}`);
+/**
+ * Generates a PDF report for a project.
+ * If automationResults is provided, it uses those. Otherwise, it runs a quick check.
+ */
+async function generateTestReport(project, automationResults = null) {
+    const { id: projectId, name: projectName, url: offerUrl } = project;
+    const screenshots = { desktop: null, ipad: null, iphone: null, android: null };
     
-    // If we have automation results, we use them for the screenshots
-    // Otherwise we fallback to the old viewport capture logic
+    // START A SINGLE BROWSER FOR THE WHOLE PROCESS
+    const browser = await getBrowser();
     
-    let screenshots = {
-        desktop: null,
-        ipad: null,
-        iphone: null,
-        android: null
-    };
+    try {
+        if (!automationResults) {
+            console.log('[PDF Gen] No automation results provided, capturing fresh screenshots...');
+            const page = await browser.newPage();
+            await new Promise(r => setTimeout(r, 1000));
 
-    if (!automationResults) {
-        const browser = await getBrowser();
+            const captureViewport = async (deviceType, viewport) => {
+                try {
+                    await page.setViewport(viewport);
+                    await page.goto(offerUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+                    await new Promise(r => setTimeout(r, 1000));
+                    const tempDir = getWritableDir('temp_screenshots');
+                    const ssPath = path.join(tempDir, `${projectId}_${deviceType}_${Date.now()}.png`);
+                    await page.screenshot({ path: ssPath, fullPage: false });
+                    return ssPath;
+                } catch (e) {
+                    console.error(`[PDF Gen] Failed to capture ${deviceType} screenshot:`, e.message);
+                    return null;
+                }
+            };
 
-        const page = await browser.newPage();
-        await new Promise(r => setTimeout(r, 1000));
-        
-        // Helper to capture a specific viewport
-        const captureViewport = async (deviceType, viewport) => {
-            try {
-                await page.setViewport(viewport);
-                await page.goto(offerUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+            screenshots.desktop = await captureViewport('desktop', VIEWPORTS.desktop);
+            screenshots.ipad = await captureViewport('ipad', VIEWPORTS.ipad);
+            screenshots.iphone = await captureViewport('iphone', VIEWPORTS.iphone);
+            screenshots.android = await captureViewport('android', VIEWPORTS.android);
+            await page.close();
+        }
+
+        // ── Check Robots.txt ──
+        let robotsTxtStatus = 'FAIL';
+        let robotsTxtScreenshot = null;
+        try {
+            const urlObj = new URL(offerUrl);
+            const baseUrl = `${urlObj.protocol}//${urlObj.hostname}`;
+            const robotsUrl = `${baseUrl}/robots.txt`;
+            const hasRobots = await checkRobotsTxt(baseUrl);
+            robotsTxtStatus = hasRobots ? 'PASS' : 'FAIL';
+
+            if (hasRobots) {
+                console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
+                const robotsPage = await browser.newPage();
                 await new Promise(r => setTimeout(r, 1000));
+                await robotsPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
+                await robotsPage.setViewport({ width: 1024, height: 768 });
                 
-                const tempDir = getWritableDir('temp_screenshots');
+                try {
+                    await robotsPage.goto(robotsUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                    await new Promise(r => setTimeout(r, 1000));
+                    const tempDir = getWritableDir('temp_screenshots');
+                    const ssPath = path.join(tempDir, `robots_${projectId}_${Date.now()}.png`);
+                    await robotsPage.screenshot({ path: ssPath });
+                    robotsTxtScreenshot = toBase64(ssPath);
+                    if (fs.existsSync(ssPath)) fs.unlinkSync(ssPath);
+                } catch (navErr) {
+                    console.error(`[PDF Gen] Robots screenshot navigation failed: ${navErr.message}`);
+                }
+                await robotsPage.close();
+            }
+        } catch (e) {
+            console.error('[PDF Gen] Failed to check robots.txt:', e.message);
+        }
 
-                const ssFilename = `${projectId}_${deviceType}_${Date.now()}.png`;
-                const ssPath = path.join(tempDir, ssFilename);
-                await page.screenshot({ path: ssPath, fullPage: false });
-                return ssPath;
-            } catch (e) {
-                console.error(`[PDF Gen] Failed to capture ${deviceType} screenshot:`, e.message);
-                return null;
+        // ── Prepare Template Data ──
+        const isHttps = offerUrl.startsWith('https://') ? 'PASS' : 'FAIL';
+        let consoleIssues = { desktop: [], mobile: [] };
+        if (automationResults?.[0]?.consoleIssues) {
+            const raw = automationResults[0].consoleIssues;
+            const convert = (list) => (list || []).map(i => ({ ...i, screenshotPath: toBase64(i.screenshotPath) }));
+            consoleIssues.desktop = convert(raw.desktop);
+            consoleIssues.mobile = convert(raw.mobile);
+        }
+
+        const templateData = {
+            projectName, offerUrl, consoleIssues,
+            automationResults: (automationResults || []).map(res => ({
+                ...res, 
+                screenshot: toBase64(res.screenshot),
+                landing_page_screenshot: toBase64(res.landing_page_screenshot)
+            })),
+            funnelNotes: [
+                "For VISA card entry A MASTERCARD popup will be displayed, which can be cancelled.",
+                "For non-affiliate url a pop-up will be shown that orders can't proceed.",
+                "[Blank page should not be shown while the user not pass affid]"
+            ],
+            usability: { 
+                windows: { status: 'FAIL' }, mac: { status: 'FAIL' }, 
+                ios: { ipad: 'FAIL', iphone: 'FAIL' }, android: { tablet: 'PASS', phone: 'FAIL' },
+                inApp: { facebook: 'PASS', skype: 'PASS' }, zoomIssue: 'FAIL'
+            },
+            uiUx: { 
+                formElements: 'PASS', buttonsAccessible: 'PASS', spelling: 'PASS', 
+                tabIndexing: 'PASS', popups: 'PASS', favicon: 'PASS', 
+                responsiveness: 'PASS', copyright: 'FAIL' 
+            },
+            autoChecks: { https: isHttps, robotsTxt: robotsTxtStatus, robotsTxtScreenshot },
+            images: {
+                desktop: toBase64(screenshots.desktop), ipad: toBase64(screenshots.ipad),
+                iphone: toBase64(screenshots.iphone), android: toBase64(screenshots.android)
             }
         };
 
-        console.log('[PDF Gen] Capturing views for default report...');
-        screenshots.desktop = await captureViewport('desktop', VIEWPORTS.desktop);
-        screenshots.ipad = await captureViewport('ipad', VIEWPORTS.ipad);
-        screenshots.iphone = await captureViewport('iphone', VIEWPORTS.iphone);
-        screenshots.android = await captureViewport('android', VIEWPORTS.android);
+        // ── Render and Generate PDF ──
+        console.log('[PDF Gen] Rendering EJS and generating PDF...');
+        const templatePath = path.join(__dirname, 'report_template.ejs');
+        const renderedHtml = ejs.render(fs.readFileSync(templatePath, 'utf8'), templateData);
+        
+        const pdfPage = await browser.newPage();
+        await new Promise(r => setTimeout(r, 1000));
+        
+        const tempHtmlPath = path.join(getWritableDir('reports'), `temp_${projectId}_${Date.now()}.html`);
+        fs.writeFileSync(tempHtmlPath, renderedHtml);
 
+        try {
+            await pdfPage.goto(`file://${tempHtmlPath}`, { waitUntil: 'load', timeout: 60000 });
+        } catch (e) {
+            await pdfPage.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle2', timeout: 60000 }).catch(() => {});
+        }
+        
+        const outputPath = path.join(getWritableDir('reports'), `${projectId}_report.pdf`);
+        await pdfPage.pdf({
+            path: outputPath, format: 'A4',
+            margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+            printBackground: true
+        });
+
+        // Cleanup
+        if (fs.existsSync(tempHtmlPath)) fs.unlinkSync(tempHtmlPath);
+        if (!automationResults) {
+            Object.values(screenshots).forEach(p => p && fs.existsSync(p) && fs.unlinkSync(p));
+        }
+
+        return outputPath;
+    } finally {
         await browser.close();
     }
-
-    // Check if HTTPS
-    const isHttps = offerUrl.startsWith('https://') ? 'PASS' : 'FAIL';
-    
-    // Check robots.txt and take screenshot
-    let robotsTxtStatus = 'FAIL';
-    let robotsTxtScreenshot = null;
-    try {
-        const urlObj = new URL(offerUrl);
-        const baseUrl = `${urlObj.protocol}//${urlObj.hostname}`;
-        const robotsUrl = `${baseUrl}/robots.txt`;
-        
-        const hasRobots = await checkRobotsTxt(baseUrl);
-        robotsTxtStatus = hasRobots ? 'PASS' : 'FAIL';
-
-        if (hasRobots) {
-            console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
-            const robotsBrowser = await getBrowser();
-            const robotsPage = await robotsBrowser.newPage();
-            await new Promise(r => setTimeout(r, 1000));
-            await robotsPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
-            await robotsPage.setViewport({ width: 1024, height: 768 });
-            
-            try {
-                await robotsPage.goto(robotsUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
-                await new Promise(r => setTimeout(r, 2000)); // Buffer for rendering
-                
-                const tempDir = getWritableDir('temp_screenshots');
-                
-                const ssPath = path.join(tempDir, `robots_${projectId}_${Date.now()}.png`);
-                await robotsPage.screenshot({ path: ssPath });
-                robotsTxtScreenshot = toBase64(ssPath);
-                if (fs.existsSync(ssPath)) fs.unlinkSync(ssPath);
-            } catch (navErr) {
-                console.error(`[PDF Gen] Robots screenshot navigation failed: ${navErr.message}`);
-            }
-            await robotsBrowser.close();
-        }
-    } catch (e) {
-        console.error('[PDF Gen] Failed to check robots.txt or take screenshot:', e.message);
-    }
-
-    // Helper to Convert Image to Base64 (moved to top)
-
-    // ── Extract Console Issues from automation results ──
-    let consoleIssues = { desktop: [], mobile: [] };
-    if (automationResults && automationResults.length > 0 && automationResults[0].consoleIssues) {
-        const raw = automationResults[0].consoleIssues;
-        // Convert screenshot paths to base64 for embedding in PDF
-        const convertIssues = (issueList) => (issueList || []).map(issue => ({
-            ...issue,
-            screenshotPath: issue.screenshotPath ? toBase64(issue.screenshotPath) : null
-        }));
-        consoleIssues.desktop = convertIssues(raw.desktop);
-        consoleIssues.mobile = convertIssues(raw.mobile);
-    }
-
-    // Prepare data for EJS template
-    const templateData = {
-        projectName: projectName,
-        offerUrl: offerUrl,
-        automationResults: (automationResults || []).map(res => ({
-            ...res,
-            screenshot: toBase64(res.screenshot),
-            landing_page_screenshot: toBase64(res.landing_page_screenshot)
-        })),
-        consoleIssues: consoleIssues,
-        funnelNotes: [
-            "For VISA card entry A MASTERCARD popup will be displayed, which can be cancelled.",
-            "For non-affiliate url a pop-up will be shown that orders can't proceed.",
-            "[Blank page should not be shown while the user not pass affid]"
-        ],
-        usability: {
-            windows: { status: 'FAIL' },
-            mac: { status: 'FAIL' },
-            ios: { ipad: 'FAIL', iphone: 'FAIL' },
-            android: { tablet: 'PASS', phone: 'FAIL' },
-            inApp: { facebook: 'PASS', skype: 'PASS' },
-            zoomIssue: 'FAIL'
-        },
-        uiUx: {
-            formElements: 'PASS',
-            buttonsAccessible: 'PASS',
-            spelling: 'PASS',
-            tabIndexing: 'PASS',
-            popups: 'PASS',
-            favicon: 'PASS',
-            responsiveness: 'PASS',
-            copyright: 'FAIL'
-        },
-        autoChecks: {
-            https: isHttps,
-            robotsTxt: robotsTxtStatus,
-            robotsTxtScreenshot: robotsTxtScreenshot
-        },
-        images: {
-            desktop: toBase64(screenshots.desktop),
-            ipad: toBase64(screenshots.ipad),
-            iphone: toBase64(screenshots.iphone),
-            android: toBase64(screenshots.android)
-        }
-    };
-
-    console.log('[PDF Gen] Rendering EJS template...');
-    const templatePath = path.join(__dirname, 'report_template.ejs');
-    const templateHtml = fs.readFileSync(templatePath, 'utf8');
-    const renderedHtml = ejs.render(templateHtml, templateData);
-    
-    // Generate the actual PDF
-    console.log('[PDF Gen] Compiling HTML to PDF...');
-    const pdfBrowser = await getBrowser();
-    const pdfPage = await pdfBrowser.newPage();
-    await new Promise(r => setTimeout(r, 1000));
-    
-    // Switch to file-based rendering for large HTML (more robust than setContent)
-    const tempHtmlPath = path.join(getWritableDir('reports'), `temp_${projectId}_${Date.now()}.html`);
-    fs.writeFileSync(tempHtmlPath, renderedHtml);
-
-    try {
-        await pdfPage.goto(`file://${tempHtmlPath}`, { 
-            waitUntil: 'load', 
-            timeout: 120000 
-        });
-    } catch (e) {
-        console.error('[PDF Gen] compilation error (retrying with networkidle2):', e.message);
-        await pdfPage.goto(`file://${tempHtmlPath}`, { 
-            waitUntil: 'networkidle2', 
-            timeout: 120000 
-        }).catch(() => {});
-    }
-    
-    // Use the reports directory we already know about
-    const reportsDir = getWritableDir('reports');
-    const outputPath = path.join(reportsDir, `${projectId}_report.pdf`);
-
-    await pdfPage.pdf({
-        path: outputPath,
-        format: 'A4',
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
-        printBackground: true
-    });
-    
-    await pdfBrowser.close();
-
-    // Clean up temporary HTML file
-    if (fs.existsSync(tempHtmlPath)) {
-        try { fs.unlinkSync(tempHtmlPath); } catch (e) { }
-    }
-    
-    // Clean up temporary screenshots (if fallback logic was used)
-    if (!automationResults) {
-        Object.values(screenshots).forEach(ssPath => {
-            if (ssPath && fs.existsSync(ssPath)) {
-                fs.unlinkSync(ssPath);
-            }
-        });
-    }
-    
-    console.log(`[PDF Gen] Success! PDF saved to: ${outputPath}`);
-    return outputPath;
 }
 
-module.exports = {
-    generateTestReport
-};
+module.exports = { generateTestReport };
