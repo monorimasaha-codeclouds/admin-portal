@@ -1,4 +1,5 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 const path = require('path');
 const fs = require('fs');
 const { getWritableDir } = require('./paths');
@@ -317,8 +318,10 @@ async function runAutomation(project, cards) {
     // ── Phase 1: Mobile Console Check (as requested in previous logic) ──
     try {
         const mobileBrowser = await puppeteer.launch({
-            headless: "new",
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--incognito']
+            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--incognito'],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
         });
         const mobileResults = await checkConsoleForViewport(
             mobileBrowser,
@@ -338,15 +341,17 @@ async function runAutomation(project, cards) {
         console.log(`[Automation] Processing card: ${card.card_number} and project url is ${offerUrl}`);
 
         const browser = await puppeteer.launch({
-            headless: "new",
             args: [
+                ...chromium.args,
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
                 '--disable-dev-shm-usage',
                 '--incognito',
                 '--start-maximized'
             ],
-            defaultViewport: null
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
         });
 
         const context = await browser.createBrowserContext();

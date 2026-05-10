@@ -1,4 +1,5 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
+const chromium = require('@sparticuz/chromium');
 const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
@@ -47,8 +48,10 @@ async function generateTestReport(projectParams) {
 
     if (!automationResults) {
         const browser = await puppeteer.launch({
-            headless: "new",
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
         });
 
         const page = await browser.newPage();
@@ -98,8 +101,10 @@ async function generateTestReport(projectParams) {
         if (hasRobots) {
             console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
             const robotsBrowser = await puppeteer.launch({ 
-                headless: "new", 
-                args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'] 
+                args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+                defaultViewport: chromium.defaultViewport,
+                executablePath: await chromium.executablePath(),
+                headless: chromium.headless,
             });
             const robotsPage = await robotsBrowser.newPage();
             await robotsPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
@@ -192,7 +197,12 @@ async function generateTestReport(projectParams) {
     
     // Generate the actual PDF
     console.log('[PDF Gen] Compiling HTML to PDF...');
-    const pdfBrowser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
+    const pdfBrowser = await puppeteer.launch({ 
+        args: [...chromium.args, '--no-sandbox'],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+    });
     const pdfPage = await pdfBrowser.newPage();
     
     // Switch to file-based rendering for large HTML (more robust than setContent)
