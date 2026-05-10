@@ -655,15 +655,22 @@ async function runAutomation(project, cards) {
 
             // 6. Wait for Thank You page
             console.log('[Automation] Waiting for Thank You page redirect...');
-            await new Promise(resolve => setTimeout(resolve, 10000));
+            // Reduced initial wait from 10s to 5s, we will poll in the loop
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
             let isThankYou = false;
-            let finalUrl = page.url();
+            let finalUrl = 'unknown';
+            try { finalUrl = page.url(); } catch (uE) { }
+
             for (let i = 0; i < 10; i++) {
-                finalUrl = page.url();
-                isThankYou = finalUrl.toLowerCase().includes('thank-you') ||
-                    finalUrl.toLowerCase().includes('thankyou') ||
-                    finalUrl.toLowerCase().includes('confirm') ||
-                    finalUrl.toLowerCase().includes('success');
+                try {
+                    finalUrl = page.url();
+                    isThankYou = finalUrl.toLowerCase().includes('thank-you') ||
+                        finalUrl.toLowerCase().includes('thankyou') ||
+                        finalUrl.toLowerCase().includes('confirm') ||
+                        finalUrl.toLowerCase().includes('success');
+                } catch (uE) { }
+                
                 if (isThankYou) break;
                 const hasText = await page.evaluate(() => {
                     return document.body.innerText.toLowerCase().includes('thank you') ||
