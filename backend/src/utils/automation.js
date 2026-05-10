@@ -337,8 +337,7 @@ async function runAutomation(project, cards) {
 
         const browser = await getBrowser();
 
-        const context = await browser.createBrowserContext();
-        const page = await context.newPage();
+        const page = await browser.newPage();
 
         // ── Stage 0: Setup Console Collector ──
         let collector = null;
