@@ -203,7 +203,7 @@ router.post('/:id/run', async (req, res) => {
     }
 
     // 2. Update status to 'testing'
-    await pool.query('UPDATE projects SET status = "testing" WHERE id = ?', [id]);
+    await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['testing', id]);
 
     console.log(`[API] Triggering automation for project ${id}...`);
     
@@ -217,13 +217,13 @@ router.post('/:id/run', async (req, res) => {
         const [reports] = await pool.query('SELECT id FROM test_reports WHERE project_id = ?', [id]);
         if (reports.length > 0) {
             await pool.query(
-                'UPDATE test_reports SET screenshots_json = ?, status = "completed" WHERE project_id = ?',
-                [JSON.stringify(results), id]
+                'UPDATE test_reports SET screenshots_json = ?, status = ? WHERE project_id = ?',
+                [JSON.stringify(results), 'completed', id]
             );
         } else {
             await pool.query(
-                'INSERT INTO test_reports (project_id, screenshots_json, status) VALUES (?, ?, "completed")',
-                [id, JSON.stringify(results)]
+                'INSERT INTO test_reports (project_id, screenshots_json, status) VALUES (?, ?, ?)',
+                [id, JSON.stringify(results), 'completed']
             );
         }
 
@@ -237,12 +237,12 @@ router.post('/:id/run', async (req, res) => {
         });
 
         // 5. Update status to 'completed'
-        await pool.query('UPDATE projects SET status = "completed" WHERE id = ?', [id]);
+        await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['completed', id]);
 
         res.json({ message: 'Automation completed successfully.', results });
     } catch (runError) {
         console.error('Automation run error:', runError);
-        await pool.query('UPDATE projects SET status = "failed" WHERE id = ?', [id]);
+        await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['failed', id]);
         res.status(500).json({ error: 'Automation failed: ' + runError.message });
     }
 
