@@ -15,7 +15,13 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'https://admin-portal-u1gq.vercel.app',
-    'https://admin-portal-gold-omega.vercel.app'
+    'https://admin-portal-gold-omega.vercel.app',
+    'https://sql301.infinityfree.com',
+    'sql301.infinityfree.com',
+    'https://dash.infinityfree.com',
+    'dash.infinityfree.com',
+    'database-dev.free.nf',
+    'https://database-dev.free.nf'
   ],
   credentials: true,
 }));
