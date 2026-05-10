@@ -48,7 +48,7 @@ async function generateTestReport(projectParams) {
 
     if (!automationResults) {
         const browser = await puppeteer.launch({
-            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'],
+            args: chromium.args,
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
             headless: chromium.headless,
@@ -101,7 +101,7 @@ async function generateTestReport(projectParams) {
         if (hasRobots) {
             console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
             const robotsBrowser = await puppeteer.launch({ 
-                args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+                args: chromium.args,
                 defaultViewport: chromium.defaultViewport,
                 executablePath: await chromium.executablePath(),
                 headless: chromium.headless,
@@ -198,7 +198,7 @@ async function generateTestReport(projectParams) {
     // Generate the actual PDF
     console.log('[PDF Gen] Compiling HTML to PDF...');
     const pdfBrowser = await puppeteer.launch({ 
-        args: [...chromium.args, '--no-sandbox'],
+        args: chromium.args,
         defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
         headless: chromium.headless,

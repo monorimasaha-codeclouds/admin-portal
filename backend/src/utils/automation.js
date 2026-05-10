@@ -318,7 +318,7 @@ async function runAutomation(project, cards) {
     // ── Phase 1: Mobile Console Check (as requested in previous logic) ──
     try {
         const mobileBrowser = await puppeteer.launch({
-            args: [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox', '--incognito'],
+            args: chromium.args,
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
             headless: chromium.headless,
@@ -341,14 +341,7 @@ async function runAutomation(project, cards) {
         console.log(`[Automation] Processing card: ${card.card_number} and project url is ${offerUrl}`);
 
         const browser = await puppeteer.launch({
-            args: [
-                ...chromium.args,
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--incognito',
-                '--start-maximized'
-            ],
+            args: chromium.args,
             defaultViewport: chromium.defaultViewport,
             executablePath: await chromium.executablePath(),
             headless: chromium.headless,
