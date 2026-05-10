@@ -201,6 +201,7 @@ async function createCompositeScreenshot(browser, pageScreenshotPath, consoleSna
     </body></html>`;
 
     const compositePage = await browser.newPage();
+    await new Promise(r => setTimeout(r, 1000));
     // Use a taller viewport to ensure the Thank You page content is visible
     await compositePage.setViewport({ width: 1600, height: 1200 });
     await compositePage.setContent(compositeHtml, { waitUntil: 'load' });
@@ -219,6 +220,7 @@ async function createCompositeScreenshot(browser, pageScreenshotPath, consoleSna
  */
 async function checkConsoleForViewport(browser, offerUrl, projectId, viewportName, viewport, ssDir) {
     const page = await browser.newPage();
+    await new Promise(r => setTimeout(r, 1000));
     await page.setViewport(viewport);
 
     const collector = await attachConsoleCollector(page);
@@ -338,6 +340,8 @@ async function runAutomation(project, cards) {
         const browser = await getBrowser();
 
         const page = await browser.newPage();
+        // Give the remote browser a moment to stabilize
+        await new Promise(r => setTimeout(r, 1000));
 
         // ── Stage 0: Setup Console Collector ──
         let collector = null;
@@ -713,7 +717,9 @@ async function runAutomation(project, cards) {
             console.error(`[Automation] Critical error: ${err.message}`);
             const errSS = path.join(ssDir, `error_${project.id}_${card.card_number}_${Date.now()}.png`);
             try { await page.screenshot({ path: errSS, fullPage: true }); } catch (sE) { }
-            results.push({ card_number: card.card_number, error: err.message, error_screenshot: errSS, url: page.url() });
+            let finalUrl = 'unknown';
+            try { finalUrl = page.url(); } catch (uE) { }
+            results.push({ card_number: card.card_number, error: err.message, error_screenshot: errSS, url: finalUrl });
         } finally {
             await browser.close();
         }

@@ -50,6 +50,7 @@ async function generateTestReport(projectParams) {
         const browser = await getBrowser();
 
         const page = await browser.newPage();
+        await new Promise(r => setTimeout(r, 1000));
         
         // Helper to capture a specific viewport
         const captureViewport = async (deviceType, viewport) => {
@@ -97,6 +98,7 @@ async function generateTestReport(projectParams) {
             console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
             const robotsBrowser = await getBrowser();
             const robotsPage = await robotsBrowser.newPage();
+            await new Promise(r => setTimeout(r, 1000));
             await robotsPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
             await robotsPage.setViewport({ width: 1024, height: 768 });
             
@@ -189,6 +191,7 @@ async function generateTestReport(projectParams) {
     console.log('[PDF Gen] Compiling HTML to PDF...');
     const pdfBrowser = await getBrowser();
     const pdfPage = await pdfBrowser.newPage();
+    await new Promise(r => setTimeout(r, 1000));
     
     // Switch to file-based rendering for large HTML (more robust than setContent)
     const tempHtmlPath = path.join(getWritableDir('reports'), `temp_${projectId}_${Date.now()}.html`);
