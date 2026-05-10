@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
+const { getBrowser } = require('./browser');
 const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
@@ -47,22 +47,7 @@ async function generateTestReport(projectParams) {
     };
 
     if (!automationResults) {
-        let browser;
-        const token = process.env.BROWSERLESS_TOKEN;
-        
-        if (token) {
-            console.log('[PDF Gen] Connecting to Browserless.io...');
-            browser = await puppeteer.connect({
-                browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
-            });
-        } else {
-            browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-            });
-        }
+        const browser = await getBrowser();
 
         const page = await browser.newPage();
         
@@ -110,19 +95,7 @@ async function generateTestReport(projectParams) {
 
         if (hasRobots) {
             console.log(`[PDF Gen] Capturing robots.txt screenshot: ${robotsUrl}`);
-            let robotsBrowser;
-            if (token) {
-                robotsBrowser = await puppeteer.connect({
-                    browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
-                });
-            } else {
-                robotsBrowser = await puppeteer.launch({ 
-                    args: chromium.args,
-                    defaultViewport: chromium.defaultViewport,
-                    executablePath: await chromium.executablePath(),
-                    headless: chromium.headless,
-                });
-            }
+            const robotsBrowser = await getBrowser();
             const robotsPage = await robotsBrowser.newPage();
             await robotsPage.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36');
             await robotsPage.setViewport({ width: 1024, height: 768 });
@@ -214,19 +187,7 @@ async function generateTestReport(projectParams) {
     
     // Generate the actual PDF
     console.log('[PDF Gen] Compiling HTML to PDF...');
-    let pdfBrowser;
-    if (process.env.BROWSERLESS_TOKEN) {
-        pdfBrowser = await puppeteer.connect({
-            browserWSEndpoint: `wss://chrome.browserless.io?token=${process.env.BROWSERLESS_TOKEN}`
-        });
-    } else {
-        pdfBrowser = await puppeteer.launch({ 
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
-        });
-    }
+    const pdfBrowser = await getBrowser();
     const pdfPage = await pdfBrowser.newPage();
     
     // Switch to file-based rendering for large HTML (more robust than setContent)

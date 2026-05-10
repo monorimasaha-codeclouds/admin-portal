@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer-core');
-const chromium = require('@sparticuz/chromium');
+const { getBrowser } = require('./browser');
 const path = require('path');
 const fs = require('fs');
 const { getWritableDir } = require('./paths');
@@ -317,22 +317,7 @@ async function runAutomation(project, cards) {
 
     // ── Phase 1: Mobile Console Check (as requested in previous logic) ──
     try {
-        let mobileBrowser;
-        const token = process.env.BROWSERLESS_TOKEN;
-        
-        if (token) {
-            console.log('[Automation] Connecting to Browserless.io...');
-            mobileBrowser = await puppeteer.connect({
-                browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
-            });
-        } else {
-            mobileBrowser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-            });
-        }
+        const mobileBrowser = await getBrowser();
         const mobileResults = await checkConsoleForViewport(
             mobileBrowser,
             offerUrl,
@@ -350,19 +335,7 @@ async function runAutomation(project, cards) {
     for (const card of cards) {
         console.log(`[Automation] Processing card: ${card.card_number} and project url is ${offerUrl}`);
 
-        let browser;
-        if (token) {
-            browser = await puppeteer.connect({
-                browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`
-            });
-        } else {
-            browser = await puppeteer.launch({
-                args: chromium.args,
-                defaultViewport: chromium.defaultViewport,
-                executablePath: await chromium.executablePath(),
-                headless: chromium.headless,
-            });
-        }
+        const browser = await getBrowser();
 
         const context = await browser.createBrowserContext();
         const page = await context.newPage();
