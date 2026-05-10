@@ -1,0 +1,9 @@
+{
+  "name": "admin-portal-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "backend-dev": "cd backend && npm run dev",
+    "frontend-dev": "cd frontend && npm run dev"
+  }
+}
