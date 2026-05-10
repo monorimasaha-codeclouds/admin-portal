@@ -27,6 +27,26 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// DEBUG ENDPOINT - Visit this in your browser to check Vercel status
+app.get('/api/debug', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  try {
+    const automationPath = path.join(__dirname, 'utils/automation.js');
+    const automationCode = fs.existsSync(automationPath) 
+      ? fs.readFileSync(automationPath, 'utf8').substring(0, 500)
+      : 'File not found at ' + automationPath;
+    res.json({
+      message: "Debug Info",
+      hasToken: !!process.env.BROWSERLESS_TOKEN,
+      isServerless: !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME),
+      codeSnippet: automationCode
+    });
+  } catch (e) {
+    res.json({ error: e.message });
+  }
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
