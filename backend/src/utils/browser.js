@@ -17,20 +17,26 @@ const puppeteer = require('puppeteer-core');
  */
 async function getBrowser() {
     const token = process.env.BROWSERLESS_TOKEN;
-    const isVercel = !!process.env.VERCEL;
+    
+    // Comprehensive check for Vercel and other serverless environments
+    const isServerless = 
+        process.env.VERCEL || 
+        process.env.NOW_REGION || 
+        process.env.AWS_LAMBDA_FUNCTION_NAME || 
+        process.env.FUNCTION_NAME;
 
     if (token) {
-        console.log('[Browser] Connecting to Browserless.io (remote)...');
+        console.log('[Browser] Connecting to Browserless.io (remote mode)...');
         return puppeteer.connect({
             browserWSEndpoint: `wss://chrome.browserless.io?token=${token}`,
         });
     }
 
-    if (isVercel) {
+    if (isServerless) {
         throw new Error(
-            'Running on Vercel but BROWSERLESS_TOKEN is not set. ' +
-            'Please add BROWSERLESS_TOKEN to your Vercel Environment Variables. ' +
-            'Get a free token at https://www.browserless.io/'
+            'CRITICAL: BROWSERLESS_TOKEN is missing in Vercel environment variables. ' +
+            'Browser automation cannot run on Vercel without a remote browser. ' +
+            'Please add BROWSERLESS_TOKEN to your Vercel Project Settings.'
         );
     }
 
