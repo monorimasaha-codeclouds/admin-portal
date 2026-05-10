@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
+const { getWritableDir } = require('./paths');
 const https = require('https');
 
 // Helper to check robots.txt
@@ -59,10 +60,7 @@ async function generateTestReport(projectParams) {
                 await page.goto(offerUrl, { waitUntil: 'networkidle2', timeout: 30000 });
                 await new Promise(r => setTimeout(r, 1000));
                 
-                const tempDir = path.join(__dirname, '../temp_screenshots');
-                if (!fs.existsSync(tempDir)) {
-                    fs.mkdirSync(tempDir, { recursive: true });
-                }
+                const tempDir = getWritableDir('temp_screenshots');
 
                 const ssFilename = `${projectId}_${deviceType}_${Date.now()}.png`;
                 const ssPath = path.join(tempDir, ssFilename);
@@ -111,8 +109,7 @@ async function generateTestReport(projectParams) {
                 await robotsPage.goto(robotsUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
                 await new Promise(r => setTimeout(r, 2000)); // Buffer for rendering
                 
-                const tempDir = path.join(__dirname, '../temp_screenshots');
-                if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+                const tempDir = getWritableDir('temp_screenshots');
                 
                 const ssPath = path.join(tempDir, `robots_${projectId}_${Date.now()}.png`);
                 await robotsPage.screenshot({ path: ssPath });
@@ -199,7 +196,7 @@ async function generateTestReport(projectParams) {
     const pdfPage = await pdfBrowser.newPage();
     
     // Switch to file-based rendering for large HTML (more robust than setContent)
-    const tempHtmlPath = path.join(__dirname, `../../reports/temp_${projectId}_${Date.now()}.html`);
+    const tempHtmlPath = path.join(getWritableDir('reports'), `temp_${projectId}_${Date.now()}.html`);
     fs.writeFileSync(tempHtmlPath, renderedHtml);
 
     try {
@@ -216,11 +213,8 @@ async function generateTestReport(projectParams) {
     }
     
     // Use the reports directory we already know about
-    const outputPath = path.join(__dirname, `../../reports/${projectId}_report.pdf`);
-    const reportsDir = path.dirname(outputPath);
-    if (!fs.existsSync(reportsDir)) {
-        fs.mkdirSync(reportsDir, { recursive: true });
-    }
+    const reportsDir = getWritableDir('reports');
+    const outputPath = path.join(reportsDir, `${projectId}_report.pdf`);
 
     await pdfPage.pdf({
         path: outputPath,

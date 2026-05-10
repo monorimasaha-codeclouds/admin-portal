@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
+const { getWritableDir } = require('./paths');
 
 // ─── Console Issue Helpers ────────────────────────────────────────────────
 
@@ -306,8 +307,7 @@ async function runAutomation(project, cards) {
     const offerUrl = project.links && project.links.length > 0 ? project.links[0].url : null;
     if (!offerUrl) throw new Error('No offer URL found for the project.');
 
-    const ssDir = path.join(__dirname, '../../reports/screenshots');
-    if (!fs.existsSync(ssDir)) fs.mkdirSync(ssDir, { recursive: true });
+    const ssDir = getWritableDir('reports/screenshots');
 
     let consoleIssues = { desktop: [], mobile: [] };
     let consoleCaptureDone = false;
