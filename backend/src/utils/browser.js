@@ -1,14 +1,3 @@
-/**
- * browser.js — Centralized browser factory for Puppeteer.
- *
- * On Vercel (or any serverless env), we MUST use a remote browser via Browserless.io
- * because the local filesystem is read-only and system libraries like libnss3 are missing.
- *
- * Locally, it falls back to launching a local Chromium via @sparticuz/chromium.
- *
- * REQUIRED: Set BROWSERLESS_TOKEN environment variable in Vercel Dashboard.
- */
-
 const puppeteer = require('puppeteer-core');
 
 /**
@@ -24,6 +13,8 @@ async function getBrowser() {
         process.env.NOW_REGION || 
         process.env.AWS_LAMBDA_FUNCTION_NAME || 
         process.env.FUNCTION_NAME;
+
+    console.log(`[Browser] Debug - Token Present: ${!!token}, Serverless Detected: ${!!isServerless}`);
 
     if (token) {
         console.log('[Browser] Connecting to Browserless.io (remote mode)...');
