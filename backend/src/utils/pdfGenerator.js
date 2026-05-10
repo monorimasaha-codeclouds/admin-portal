@@ -26,19 +26,29 @@ const VIEWPORTS = {
 // Helper to Convert Image to Base64
 function toBase64(filePath) {
     if (!filePath || !fs.existsSync(filePath)) return null;
-    const bitmap = fs.readFileSync(filePath);
-    return `data:image/png;base64,${Buffer.from(bitmap).toString('base64')}`;
+    try {
+        const bitmap = fs.readFileSync(filePath);
+        return `data:image/png;base64,${Buffer.from(bitmap).toString('base64')}`;
+    } catch (e) {
+        return null;
+    }
 }
 
 /**
  * Generates a PDF report for a project.
- * If automationResults is provided, it uses those. Otherwise, it runs a quick check.
  */
-async function generateTestReport(project, automationResults = null) {
-    const { id: projectId, name: projectName, url: offerUrl } = project;
+async function generateTestReport(data) {
+    // Correctly extract properties passed from projects.js
+    const projectId = data.projectId || data.id;
+    const projectName = data.projectName || data.name;
+    const offerUrl = data.offerUrl || data.url;
+    const automationResults = data.automationResults;
+
+    if (!offerUrl) {
+        throw new Error('[PDF Gen] Cannot generate report: offerUrl is missing.');
+    }
+
     const screenshots = { desktop: null, ipad: null, iphone: null, android: null };
-    
-    // START A SINGLE BROWSER FOR THE WHOLE PROCESS
     const browser = await getBrowser();
     
     try {
