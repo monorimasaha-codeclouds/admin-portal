@@ -12,14 +12,7 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://admin-portal-u1gq.vercel.app',
-    'https://test-admin.housiey.com',
-    'http://localhost:3000',
-    'https://admin-portal-u1gq.vercel.app',
-    'https://test-admin.housiey.com'
-  ],
+  origin: true,
   credentials: true,
 }));
 app.use(express.json());
