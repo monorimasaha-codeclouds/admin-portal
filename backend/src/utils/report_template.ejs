@@ -436,30 +436,40 @@
                         </div>
                     <% } %>
 
-                    <div style="display: flex; gap: 20px; justify-content: space-between;">
-                        <div style="width: 48%;">
-                            <strong style="display: block; margin-bottom: 10px; font-size: 11pt;">1. Landing Page Snapshot:</strong>
+                    <div style="display: flex; gap: 15px; justify-content: space-between; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 30%;">
+                            <strong style="display: block; margin-bottom: 10px; font-size: 10pt;">1. Landing Page Snapshot:</strong>
                             <% if (result.landing_page_screenshot) { %>
                                 <div class="screenshot-container success" style="margin: 0;">
                                     <img src="<%- result.landing_page_screenshot %>" alt="Landing Page" style="border-width: 2px; border-color: #3498db;" />
                                 </div>
                             <% } else { %>
-                                <p style="color: #95a5a6;">N/A</p>
+                                <p style="color: #95a5a6; font-size: 9pt;">N/A</p>
                             <% } %>
                         </div>
-                        <div style="width: 48%;">
+                        <div style="flex: 1; min-width: 30%;">
+                            <strong style="display: block; margin-bottom: 10px; font-size: 10pt;">2. Checkout Page Snapshot:</strong>
+                            <% if (result.checkout_page_screenshot) { %>
+                                <div class="screenshot-container success" style="margin: 0;">
+                                    <img src="<%- result.checkout_page_screenshot %>" alt="Checkout Page" style="border-width: 2px; border-color: #f39c12;" />
+                                </div>
+                            <% } else { %>
+                                <p style="color: #95a5a6; font-size: 9pt;">N/A</p>
+                            <% } %>
+                        </div>
+                        <div style="flex: 1; min-width: 30%;">
                             <% 
-                                const isSuccess = !result.error && (result.url.includes('thankyou') || result.url.includes('thank-you') || result.url.includes('confirm'));
+                                const isSuccess = !result.error && (result.url.includes('thankyou') || result.url.includes('thank-you') || result.url.includes('confirm') || result.url.includes('success'));
                             %>
-                            <strong style="display: block; margin-bottom: 10px; font-size: 11pt; color: <%= isSuccess ? '#27ae60' : '#c0392b' %>;">
-                                2. Final Page Snapshot (<%= isSuccess ? 'PASS' : 'FAIL' %>):
+                            <strong style="display: block; margin-bottom: 10px; font-size: 10pt; color: <%= isSuccess ? '#27ae60' : '#c0392b' %>;">
+                                3. Final Page Snapshot (<%= isSuccess ? 'PASS' : 'FAIL' %>):
                             </strong>
                             <% if (result.screenshot) { %>
                                 <div class="screenshot-container <%= isSuccess ? 'success' : '' %>" style="margin: 0;">
                                     <img src="<%- result.screenshot %>" alt="Final Page" style="border-width: 4px; border-color: <%= isSuccess ? '#27ae60' : '#c0392b' %>;" />
                                 </div>
                             <% } else { %>
-                                <p style="color: #95a5a6;">Missing Final Snapshot</p>
+                                <p style="color: #95a5a6; font-size: 9pt;">Missing Final Snapshot</p>
                             <% } %>
                         </div>
                     </div>

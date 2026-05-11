@@ -402,46 +402,46 @@ async function runAutomation(project, cards) {
                 '#shippingZip1, input[name*="shippingZip"]': project.zip,
             };
 
-            // for (const [selector, value] of Object.entries(fields)) {
-            //     try {
-            //         const element = await page.waitForSelector(selector, { timeout: 15000 });
-            //         if (element) {
-            //             if (selector.includes('select')) {
-            //                 // Try to select by value or text
-            //                 await page.select(selector, value).catch(() => { });
-            //                 await page.evaluate((sel, val) => {
-            //                     const select = document.querySelector(sel);
-            //                     if (select) {
-            //                         select.removeAttribute('readonly');
-            //                         select.disabled = false;
-            //                         const option = Array.from(select.options).find(o =>
-            //                             o.value.toLowerCase().includes(val.toLowerCase()) ||
-            //                             o.text.toLowerCase().includes(val.toLowerCase())
-            //                         );
-            //                         if (option) {
-            //                             select.value = option.value;
-            //                             select.dispatchEvent(new Event('input', { bubbles: true }));
-            //                             select.dispatchEvent(new Event('change', { bubbles: true }));
-            //                             select.dispatchEvent(new Event('blur', { bubbles: true }));
-            //                         }
-            //                     }
-            //                 }, selector, value);
-            //             } else {
-            //                 await page.evaluate((sel, val) => {
-            //                     const el = document.querySelector(sel);
-            //                     if (el) {
-            //                         el.removeAttribute('readonly');
-            //                         el.disabled = false;
-            //                         el.value = val;
-            //                         el.dispatchEvent(new Event('input', { bubbles: true }));
-            //                         el.dispatchEvent(new Event('change', { bubbles: true }));
-            //                         el.dispatchEvent(new Event('blur', { bubbles: true }));
-            //                     }
-            //                 }, selector, value.toString());
-            //             }
-            //         }
-            //     } catch (e) { }
-            // }
+            for (const [selector, value] of Object.entries(fields)) {
+                try {
+                    const element = await page.waitForSelector(selector, { timeout: 15000 });
+                    if (element) {
+                        if (selector.includes('select')) {
+                            // Try to select by value or text
+                            await page.select(selector, value).catch(() => { });
+                            await page.evaluate((sel, val) => {
+                                const select = document.querySelector(sel);
+                                if (select) {
+                                    select.removeAttribute('readonly');
+                                    select.disabled = false;
+                                    const option = Array.from(select.options).find(o =>
+                                        o.value.toLowerCase().includes(val.toLowerCase()) ||
+                                        o.text.toLowerCase().includes(val.toLowerCase())
+                                    );
+                                    if (option) {
+                                        select.value = option.value;
+                                        select.dispatchEvent(new Event('input', { bubbles: true }));
+                                        select.dispatchEvent(new Event('change', { bubbles: true }));
+                                        select.dispatchEvent(new Event('blur', { bubbles: true }));
+                                    }
+                                }
+                            }, selector, value);
+                        } else {
+                            await page.evaluate((sel, val) => {
+                                const el = document.querySelector(sel);
+                                if (el) {
+                                    el.removeAttribute('readonly');
+                                    el.disabled = false;
+                                    el.value = val;
+                                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                                    el.dispatchEvent(new Event('blur', { bubbles: true }));
+                                }
+                            }, selector, value.toString());
+                        }
+                    }
+                } catch (e) { }
+            }
 
             const landing_page_screenshot = path.join(ssDir, `landing_${project.id}_${card.card_number}_${Date.now()}.png`);
             await page.screenshot({ path: landing_page_screenshot, fullPage: true });
@@ -474,6 +474,13 @@ async function runAutomation(project, cards) {
 
             await new Promise(r => setTimeout(r, 4000));
             if (!consoleCaptureDone) await takeConsoleSnapshot('Checkout Page');
+
+            const checkout_page_screenshot = path.join(ssDir, `checkout_${project.id}_${card.card_number}_${Date.now()}.png`);
+            try {
+                await page.screenshot({ path: checkout_page_screenshot, fullPage: true });
+            } catch (ssErr) {
+                try { await page.screenshot({ path: checkout_page_screenshot }); } catch (e) { }
+            }
 
             // 4. Fill Checkout Form (original robust logic)
             const paymentFields = {
@@ -716,6 +723,7 @@ async function runAutomation(project, cards) {
                 card_number: card.card_number,
                 url: finalUrl,
                 landing_page_screenshot: landing_page_screenshot,
+                checkout_page_screenshot: checkout_page_screenshot,
                 screenshot: screenshotPath,
                 error: errorMsg
             });

@@ -30,7 +30,20 @@ const toBase64 = (filePath) => {
 };
 
 async function generateTestReport(projectParams) {
-    const { projectId, offerUrl, projectName, automationResults } = projectParams;
+    let { projectId, offerUrl, projectName, automationResults } = projectParams;
+
+    // Normalize automationResults: ensure it's an array, parse if it's a JSON string
+    if (typeof automationResults === 'string') {
+        try {
+            automationResults = JSON.parse(automationResults);
+        } catch (e) {
+            console.error(`[PDF Gen] Failed to parse automationResults JSON for project ${projectId}:`, e.message);
+            automationResults = [];
+        }
+    }
+    if (!Array.isArray(automationResults)) {
+        automationResults = automationResults ? [automationResults] : [];
+    }
 
     console.log(`[PDF Gen] Starting report generation for Project: ${projectId}`);
     
@@ -149,7 +162,8 @@ async function generateTestReport(projectParams) {
         automationResults: (automationResults || []).map(res => ({
             ...res,
             screenshot: toBase64(res.screenshot),
-            landing_page_screenshot: toBase64(res.landing_page_screenshot)
+            landing_page_screenshot: toBase64(res.landing_page_screenshot),
+            checkout_page_screenshot: toBase64(res.checkout_page_screenshot)
         })),
         consoleIssues: consoleIssues,
         funnelNotes: [
