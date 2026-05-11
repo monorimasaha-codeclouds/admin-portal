@@ -15,6 +15,9 @@ app.use(cors({
   origin: [
     'http://localhost:3000',
     'https://admin-portal-u1gq.vercel.app',
+    'https://test-admin.housiey.com',
+    'http://localhost:3000',
+    'https://admin-portal-u1gq.vercel.app',
     'https://test-admin.housiey.com'
   ],
   credentials: true,
