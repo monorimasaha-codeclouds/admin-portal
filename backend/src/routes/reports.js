@@ -6,6 +6,7 @@ const adminAuth = require('../middleware/adminAuth');
 const { generateTestReport } = require('../utils/pdfGenerator');
 const fs = require('fs');
 const path = require('path');
+const { getWritableDir } = require('../utils/paths');
 
 // GET /api/reports/download/:projectId
 router.get('/download/:projectId', authMiddleware, async (req, res) => {
@@ -25,6 +26,8 @@ router.get('/download/:projectId', authMiddleware, async (req, res) => {
         // Check if report already exists in temp dir to avoid regenerating immediately (basic caching)
         // In a real app we'd regenerate on request or have a specific "Generate New" button
         const reportPath = path.join(__dirname, `../../reports/${project.id}_report.pdf`);
+        // const reportsDir = getWritableDir('reports');
+        // const reportPath = path.join(reportsDir, `${project.id}_report.pdf`);
 
         // Fetch automation results from DB to include in the PDF
         const [reports] = await db.execute('SELECT screenshots_json FROM test_reports WHERE project_id = ? ORDER BY created_at DESC LIMIT 1', [project.id]);

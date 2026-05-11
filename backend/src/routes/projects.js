@@ -88,8 +88,8 @@ router.post('/', async (req, res) => {
       connection.release();
     }
     console.error('Create project error:', err);
-    res.status(err.message.includes('required') || err.message.includes('Incomplete') ? 400 : 500).json({ 
-      error: err.message || 'Internal server error.' 
+    res.status(err.message.includes('required') || err.message.includes('Incomplete') ? 400 : 500).json({
+      error: err.message || 'Internal server error.'
     });
   }
 });
@@ -199,7 +199,7 @@ router.post('/:id/run', async (req, res) => {
     // However, the user wants to see the results.
     // For now, let's run it and return results (if timeout permits) or send a 202.
     // We'll try to run it synchronously for simplicity first, but increase timeout.
-    
+
     console.log(`[API] Triggering automation for project ${project.id}...`);
     const results = await runAutomation(project, cards);
 
@@ -239,7 +239,7 @@ router.post('/:id/run', async (req, res) => {
 router.post('/:id/run', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // 1. Fetch project with links and cards
     const [projects] = await pool.query(
       'SELECT * FROM projects WHERE id = ? AND user_id = ?',
@@ -270,9 +270,12 @@ router.post('/:id/run', async (req, res) => {
     if (links.length === 0) {
       return res.status(400).json({ error: 'Project has no URLs to test.' });
     }
+    if (cards.length === 0) {
+      return res.status(400).json({ error: 'No test cards assigned to this project.' });
+    }
 
     // 2. Update status to 'testing'
-    await pool.query('UPDATE projects SET status = "testing" WHERE id = ?', [id]);
+    await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['testing', id]);
 
     // 3. Run Automation (In background or wait?)
     // For simplicity in this demo, we wait, but in production this should be a job
@@ -282,27 +285,27 @@ router.post('/:id/run', async (req, res) => {
     // Respond early to avoid timeout if it takes too long
     // But for this task, the user wants to see the result, so we might wait a bit or use a separate status check.
     // However, let's process it and let the frontend poll or wait.
-    
+    console.log(`[API] Triggering automation for project ${id}...`);
     try {
-        const automationResults = await runAutomation(project, cards);
-        
-        // 4. Generate Report
-        const offerUrl = links[0].url;
-        await generateTestReport({
-            projectId: id,
-            projectName: project.project_name,
-            offerUrl: offerUrl,
-            automationResults: automationResults
-        });
+      const automationResults = await runAutomation(project, cards);
 
-        // 5. Update status to 'completed'
-        await pool.query('UPDATE projects SET status = "completed" WHERE id = ?', [id]);
+      // 4. Generate Report
+      const offerUrl = links[0].url;
+      await generateTestReport({
+        projectId: id,
+        projectName: project.project_name,
+        offerUrl: offerUrl,
+        automationResults: automationResults
+      });
 
-        res.json({ message: 'Automation completed successfully.', results: automationResults });
+      // 5. Update status to 'completed'
+      await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['completed', id]);
+
+      res.json({ message: 'Automation completed successfully.', results: automationResults });
     } catch (runError) {
-        console.error('Automation run error:', runError);
-        await pool.query('UPDATE projects SET status = "failed" WHERE id = ?', [id]);
-        res.status(500).json({ error: 'Automation failed: ' + runError.message });
+      console.error('Automation run error:', runError);
+      await pool.query('UPDATE projects SET status = ? WHERE id = ?', ['failed', id]);
+      res.status(500).json({ error: 'Automation failed: ' + runError.message });
     }
 
   } catch (err) {
