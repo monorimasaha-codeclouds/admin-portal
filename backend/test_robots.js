@@ -21,7 +21,7 @@ async function testRobots() {
         console.error('Test failed:', e.message);
     } finally {
         await browser.close();
-        console.log('Browser closed.');
+        console.log('Browser closed...');
     }
 }
 
